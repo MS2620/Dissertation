@@ -27,7 +27,7 @@ export const useRegister = () => {
     onSuccess: () => {
       toast.success("Account created successfully");
       router.refresh();
-      queryClient.invalidateQueries({ queryKey: "current" });
+      queryClient.invalidateQueries({ queryKey: ["current"] });
     },
     onError: () => {
       toast.error("Failed to create account");
