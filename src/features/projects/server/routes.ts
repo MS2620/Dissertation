@@ -55,6 +55,7 @@ const app = new Hono()
       return c.json({ data: project });
     }
   )
+
   .get(
     "/",
     sessionMiddleware,
@@ -106,6 +107,7 @@ const app = new Hono()
       return c.json({ data: currentProject });
     }
   )
+
   .patch(
     "/:projectId",
     sessionMiddleware,
@@ -161,6 +163,7 @@ const app = new Hono()
       return c.json({ data: project });
     }
   )
+
   .delete("/:projectId", sessionMiddleware, async (c) => {
     const databases = c.get("databases");
     const user = c.get("user");
