@@ -1,20 +1,28 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { useGetMembers } from "@/features/members/api/use-get-members";
-import { useGetProjects } from "@/features/projects/api/use-get-projects";
 import { useWorkspaceId } from "@/features/workspaces/hooks/use-workspace-id";
 import { Loader } from "lucide-react";
-import { CreateTaskForm } from "./create-task-form";
+import { EditTaskForm } from "../components/edit-task-form";
 import { useProjectId } from "../hooks/use-project-id";
+import { useGetTask } from "../api/use-get-task";
 
-interface CreateTaskFormWrapperProps {
+interface EditTaskFormWrapperProps {
   onCancel: () => void;
+  $id: string;
 }
 
-export const CreateTaskFormWrapper = ({
+export const EditTaskFormWrapper = ({
   onCancel,
-}: CreateTaskFormWrapperProps) => {
+  $id,
+}: EditTaskFormWrapperProps) => {
   const projectId = useProjectId();
   const workspaceId = useWorkspaceId();
+
+  const { data: initialValues, isLoading: isLoadingInitialValues } = useGetTask(
+    {
+      taskId: $id,
+    }
+  );
 
   const { data: members, isLoading: isLoadingMembers } = useGetMembers({
     workspaceId,
@@ -37,11 +45,16 @@ export const CreateTaskFormWrapper = ({
     );
   }
 
+  if (!initialValues) {
+    return null;
+  }
+
   return (
-    <CreateTaskForm
+    <EditTaskForm
       onCancel={onCancel}
       projectId={projectId}
       memberOptions={memberOptions || []}
+      initialValues={initialValues}
     />
   );
 };

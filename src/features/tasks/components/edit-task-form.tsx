@@ -7,9 +7,8 @@ import { cn } from "@/lib/utils";
 
 import { useWorkspaceId } from "@/features/workspaces/hooks/use-workspace-id";
 import { createTaskSchema } from "../schemas";
-import { useCreateTask } from "../api/use-create-task";
 import { MemberAvatar } from "@/features/members/components/member-avatar";
-import { TaskStatus } from "../types";
+import { Task, TaskStatus } from "../types";
 
 import { DatePicker } from "@/components/date-picker";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -31,32 +30,43 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { useUpdateTask } from "../api/use-update-task";
 
-interface CreateTaskFormProps {
+interface EditTaskFormProps {
   onCancel?: () => void;
   projectId: string;
   memberOptions: { $id: string; name: string }[];
+  initialValues: Task;
 }
 
-export const CreateTaskForm = ({
+export const EditTaskForm = ({
   onCancel,
   projectId,
   memberOptions,
-}: CreateTaskFormProps) => {
+  initialValues,
+}: EditTaskFormProps) => {
   const workspaceId = useWorkspaceId();
-  const { mutate, isPending } = useCreateTask();
+  const { mutate, isPending } = useUpdateTask();
 
   const form = useForm<z.infer<typeof createTaskSchema>>({
-    resolver: zodResolver(createTaskSchema.omit({ workspaceId: true })),
+    resolver: zodResolver(
+      createTaskSchema.omit({
+        workspaceId: true,
+        description: true,
+        projectId: true,
+      })
+    ),
     defaultValues: {
-      workspaceId,
-      projectId,
+      ...initialValues,
+      dueDate: initialValues.dueDate
+        ? new Date(initialValues.dueDate)
+        : undefined,
     },
   });
 
   const onSubmit = (values: z.infer<typeof createTaskSchema>) => {
     mutate(
-      { json: { ...values, workspaceId } },
+      { json: values, param: { taskId: initialValues.$id } },
       {
         onSuccess: () => {
           form.reset();
@@ -69,7 +79,7 @@ export const CreateTaskForm = ({
   return (
     <Card className="w-full h-full border-none shadow-none">
       <CardHeader className="flex p-7">
-        <CardTitle className="text-xl font-bold">Create a new task</CardTitle>
+        <CardTitle className="text-xl font-bold">Edit a task</CardTitle>
       </CardHeader>
       <div className="px-7">
         <Separator />
@@ -194,7 +204,7 @@ export const CreateTaskForm = ({
                     <Loader className="animate-spin size-10" /> Loading
                   </>
                 ) : (
-                  "Create Task"
+                  "Save Changes"
                 )}
               </Button>
             </div>

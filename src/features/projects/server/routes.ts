@@ -58,12 +58,18 @@ const app = new Hono()
   .get(
     "/",
     sessionMiddleware,
-    zValidator("query", z.object({ workspaceId: z.string() })),
+    zValidator(
+      "query",
+      z.object({
+        workspaceId: z.string(),
+        projectId: z.string().optional(),
+      })
+    ),
     async (c) => {
       const user = c.get("user");
       const databases = c.get("databases");
 
-      const { workspaceId } = c.req.valid("query");
+      const { workspaceId, projectId } = c.req.valid("query");
 
       const member = await getMember({
         databases,
@@ -75,12 +81,29 @@ const app = new Hono()
         return c.json({ error: "Unauthorized" }, 401);
       }
 
-      const projects = await databases.listDocuments(DATABASE_ID, PROJECTS_ID, [
-        Query.orderDesc("$createdAt"),
-        Query.contains("workspaceId", workspaceId),
-      ]);
+      if (!projectId) {
+        const projects = await databases.listDocuments(
+          DATABASE_ID,
+          PROJECTS_ID,
+          [
+            Query.orderDesc("$createdAt"),
+            Query.contains("workspaceId", workspaceId),
+          ]
+        );
 
-      return c.json({ data: projects });
+        return c.json({ data: projects });
+      }
+
+      const currentProject = await databases.listDocuments(
+        DATABASE_ID,
+        PROJECTS_ID,
+        [
+          Query.contains("workspaceId", workspaceId),
+          Query.contains("$id", projectId),
+        ]
+      );
+
+      return c.json({ data: currentProject });
     }
   )
   .patch(
