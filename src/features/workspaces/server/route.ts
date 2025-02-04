@@ -194,15 +194,13 @@ const app = new Hono()
       const databases = c.get("databases");
       const user = c.get("user");
 
+      console.log("user", user);
+
       const member = await getMember({
         databases,
         workspaceId,
         userId: user.$id,
       });
-
-      if (member.total > 0) {
-        return c.json({ error: "Already a member" }, 400);
-      }
 
       const workspace = await databases.getDocument<Workspace>(
         DATABASE_ID,
