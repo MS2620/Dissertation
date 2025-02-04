@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 
 import { getCurrent } from "@/features/auth/queries";
-import { EditWorkspaceForm } from "@/features/workspaces/components/edit-workspace-form copy";
+import { EditWorkspaceForm } from "@/features/workspaces/components/edit-workspace-form";
 import { getWorkspace } from "@/features/workspaces/queries";
 
 interface WorkspaceIdSettingsPageProps {
@@ -21,10 +21,6 @@ const WorkspaceIdSettingsPage = async ({
   }
 
   const initialValues = await getWorkspace({ workspaceId: workspaceId });
-
-  if (!initialValues) {
-    redirect(`/workspaces/${workspaceId}`);
-  }
 
   return (
     <div className="w-full lg:max-w-xl">
