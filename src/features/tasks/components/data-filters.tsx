@@ -7,10 +7,11 @@ import {
   SelectValue,
   SelectItem,
 } from "@/components/ui/select";
-import { ListChecksIcon, Loader, UserIcon } from "lucide-react";
+import { FolderIcon, ListChecksIcon, Loader, UserIcon } from "lucide-react";
 import { TaskStatus } from "../types";
 import { useTaskFilters } from "../hooks/use-task-filters";
 import { DatePicker } from "@/components/date-picker";
+import { useGetProjects } from "@/features/projects/api/use-get-projects";
 
 interface DataFiltersProps {
   hideProjectFilter?: boolean;
@@ -19,16 +20,27 @@ interface DataFiltersProps {
 export const DataFilters = ({ hideProjectFilter }: DataFiltersProps) => {
   const workspaceId = useWorkspaceId();
 
+  const { data: projects, isLoading: isLoadingProjects } = useGetProjects({
+    workspaceId,
+  });
   const { data: members, isLoading: isLoadingMembers } = useGetMembers({
     workspaceId,
   });
+
+  const isLoading = isLoadingProjects || isLoadingMembers;
+
+  const projectOptions = projects?.documents.map((project) => ({
+    value: project.$id,
+    label: project.name,
+  }));
 
   const memberOptions = members?.documents.map((member) => ({
     value: member.$id,
     label: member.name,
   }));
 
-  const [{ status, assigneeId, dueDate }, setFilters] = useTaskFilters();
+  const [{ status, assigneeId, projectId, dueDate }, setFilters] =
+    useTaskFilters();
 
   const onStatusChange = (value: string) => {
     setFilters({ status: value === "all" ? null : (value as TaskStatus) });
@@ -38,7 +50,11 @@ export const DataFilters = ({ hideProjectFilter }: DataFiltersProps) => {
     setFilters({ assigneeId: value === "all" ? null : (value as string) });
   };
 
-  if (isLoadingMembers) {
+  const onProjectChange = (value: string) => {
+    setFilters({ projectId: value === "all" ? null : (value as string) });
+  };
+
+  if (isLoading) {
     return (
       <div className="w-full border rounded-lg h-[200px] flex flex-col items-center justify-center">
         <Loader className="size-5 animate-spin text-muted-foreground" />
@@ -68,6 +84,28 @@ export const DataFilters = ({ hideProjectFilter }: DataFiltersProps) => {
           <SelectItem value={TaskStatus.DONE}>Complete</SelectItem>
         </SelectContent>
       </Select>
+      {!hideProjectFilter && (
+        <Select
+          defaultValue={projectId ?? undefined}
+          onValueChange={(value) => onProjectChange(value)}
+        >
+          <SelectTrigger className="w-full lg:w-auto h-8">
+            <div className="flex items-center pr-2">
+              <FolderIcon className="size-4 mr-2" />
+              <SelectValue placeholder="All projects" />
+            </div>
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All projects</SelectItem>
+            <SelectSeparator />
+            {projectOptions?.map((project) => (
+              <SelectItem key={project.value} value={project.value}>
+                {project.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      )}
       <Select
         defaultValue={assigneeId ?? undefined}
         onValueChange={(value) => onAssigneeChange(value)}

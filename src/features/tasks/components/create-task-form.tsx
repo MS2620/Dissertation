@@ -31,18 +31,23 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { ProjectAvatar } from "@/features/projects/components/project-avatar";
+import { useProjectId } from "../hooks/use-project-id";
 
 interface CreateTaskFormProps {
   onCancel?: () => void;
-  projectId: string;
+  projectOptions: { value: string; label: string }[];
   memberOptions: { $id: string; name: string }[];
+  hideProjectFilter?: boolean;
 }
 
 export const CreateTaskForm = ({
   onCancel,
-  projectId,
+  projectOptions,
   memberOptions,
+  hideProjectFilter,
 }: CreateTaskFormProps) => {
+  const projectId = useProjectId();
   const workspaceId = useWorkspaceId();
   const { mutate, isPending } = useCreateTask();
 
@@ -50,7 +55,7 @@ export const CreateTaskForm = ({
     resolver: zodResolver(createTaskSchema.omit({ workspaceId: true })),
     defaultValues: {
       workspaceId,
-      projectId,
+      projectId: hideProjectFilter ? projectId : undefined,
     },
   });
 
@@ -175,6 +180,44 @@ export const CreateTaskForm = ({
                   </FormItem>
                 )}
               />
+              {!hideProjectFilter && (
+                <FormField
+                  control={form.control}
+                  name="projectId"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Project</FormLabel>
+                      <Select
+                        defaultValue={field.value}
+                        onValueChange={field.onChange}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select project" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <FormMessage />
+                        <SelectContent>
+                          {projectOptions.map((project) => (
+                            <SelectItem
+                              key={project.value}
+                              value={project.value}
+                            >
+                              <div className="flex items-center gap-x-2">
+                                <ProjectAvatar
+                                  fallbackClassName="size-6"
+                                  name={project.label}
+                                />
+                                {project.label}
+                              </div>
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </FormItem>
+                  )}
+                />
+              )}
             </div>
             <Separator className="my-7" />
             <div className="flex items-center justify-between">

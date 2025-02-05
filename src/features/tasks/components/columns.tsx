@@ -34,6 +34,33 @@ export const columns: ColumnDef<Task>[] = [
     },
   },
   {
+    accessorKey: "project",
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Project
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      );
+    },
+    cell: ({ row }) => {
+      const project = row.original.project;
+
+      return (
+        <div className="flex items-center gap-x-2 text-sm font-medium">
+          <ProjectAvatar
+            fallbackClassName="size-6 text-xs"
+            name={project.name}
+          />
+          <p className="line-clamp-1">{project.name}</p>
+        </div>
+      );
+    },
+  },
+  {
     accessorKey: "assignee",
     header: ({ column }) => {
       return (

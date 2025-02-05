@@ -16,16 +16,25 @@ export const CreateTaskFormWrapper = ({
   const projectId = useProjectId();
   const workspaceId = useWorkspaceId();
 
+  const { data: projects, isLoading: isLoadingProjects } = useGetProjects({
+    workspaceId,
+  });
+
   const { data: members, isLoading: isLoadingMembers } = useGetMembers({
     workspaceId,
   });
+
+  const projectOptions = projects?.documents.map((project) => ({
+    value: project.$id,
+    label: project.name,
+  }));
 
   const memberOptions = members?.documents.map((project) => ({
     $id: project.$id,
     name: project.name,
   }));
 
-  const isLoading = isLoadingMembers;
+  const isLoading = isLoadingProjects || isLoadingMembers;
 
   if (isLoading) {
     return (
@@ -37,10 +46,21 @@ export const CreateTaskFormWrapper = ({
     );
   }
 
+  if (projectId) {
+    return (
+      <CreateTaskForm
+        onCancel={onCancel}
+        projectOptions={projectOptions || []}
+        memberOptions={memberOptions || []}
+        hideProjectFilter
+      />
+    );
+  }
+
   return (
     <CreateTaskForm
       onCancel={onCancel}
-      projectId={projectId}
+      projectOptions={projectOptions || []}
       memberOptions={memberOptions || []}
     />
   );

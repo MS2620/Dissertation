@@ -13,26 +13,33 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { DataFilters } from "./data-filters";
 import { DataTable } from "./data-table";
 import { columns } from "./columns";
-import { useProjectId } from "../hooks/use-project-id";
 import { DataKanBan } from "./data-kanban";
 import { useCallback } from "react";
 import { TaskStatus } from "../types";
 import { useBulkUpdateTask } from "../api/use-bulk-update-tasks";
 import { DataCalendar } from "./data-calendar";
+import { useProjectId } from "../hooks/use-project-id";
 
-export const TaskViewSwitcher = () => {
-  const [{ status, assigneeId, dueDate }] = useTaskFilters();
+interface TaskViewSwitcherProps {
+  hideProjectFilter?: boolean;
+}
+
+export const TaskViewSwitcher = ({
+  hideProjectFilter,
+}: TaskViewSwitcherProps) => {
+  const [{ status, assigneeId, projectId, dueDate }] = useTaskFilters();
   const [view, setView] = useQueryState("task-view", {
     defaultValue: "table",
   });
   const workspaceId = useWorkspaceId();
-  const projectId = useProjectId();
 
   const { mutate: bulkUpdate } = useBulkUpdateTask();
 
+  const projectIds = useProjectId();
+
   const { data: tasks, isLoading: isLoadingTasks } = useGetTasks({
     workspaceId,
-    projectId,
+    projectId: projectIds ? projectIds : projectId,
     assigneeId,
     status,
     dueDate,
@@ -74,7 +81,7 @@ export const TaskViewSwitcher = () => {
           </Button>
         </div>
         <Separator className="my-4" />
-        <DataFilters />
+        <DataFilters hideProjectFilter={hideProjectFilter} />
         <Separator className="my-4" />
         {isLoadingTasks ? (
           <div className="w-full border rounded-lg h-[200px] flex flex-col items-center justify-center">
