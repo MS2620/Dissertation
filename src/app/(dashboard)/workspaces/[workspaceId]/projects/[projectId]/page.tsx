@@ -28,7 +28,7 @@ const ProjectIdPage = async ({ params }: ProjectIdPageProps) => {
           <ProjectAvatar
             name={initialValues.name}
             image={initialValues.imageUrl}
-            className="size-8"
+            fallbackClassName="size-8"
           />
           <p className="text-lg font-semibold">{initialValues.name}</p>
         </div>
