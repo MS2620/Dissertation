@@ -41,6 +41,8 @@ export const WorkspaceIdClient = () => {
     workspaceId,
   });
 
+  console.log(members);
+
   const isLoading =
     isLoadingAnalytics ||
     isLoadingTasks ||
@@ -51,7 +53,7 @@ export const WorkspaceIdClient = () => {
     return <PageLoader />;
   }
 
-  if (!analytics || !tasks || !projects || !members) {
+  if (!analytics || !tasks || !projects) {
     return <PageError message="Failed to load workspace data." />;
   }
 
@@ -61,7 +63,9 @@ export const WorkspaceIdClient = () => {
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
         <TaskList data={tasks.documents} total={tasks.total} />
         <ProjectList data={projects.documents} total={projects.total} />
-        <MembersList data={members.documents} total={members.total} />
+        {members && (
+          <MembersList data={members.documents} total={members.total} />
+        )}
       </div>
     </div>
   );
