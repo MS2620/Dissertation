@@ -32,14 +32,13 @@ export const TaskViewSwitcher = ({
     defaultValue: "table",
   });
   const workspaceId = useWorkspaceId();
+  const paramProjectId = useProjectId();
 
   const { mutate: bulkUpdate } = useBulkUpdateTask();
 
-  const projectIds = useProjectId();
-
   const { data: tasks, isLoading: isLoadingTasks } = useGetTasks({
     workspaceId,
-    projectId: projectIds ? projectIds : projectId,
+    projectId: paramProjectId || projectId,
     assigneeId,
     status,
     dueDate,

@@ -5,7 +5,6 @@ import { z } from "zod";
 import { Loader } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-import { useWorkspaceId } from "@/features/workspaces/hooks/use-workspace-id";
 import { createTaskSchema } from "../schemas";
 import { MemberAvatar } from "@/features/members/components/member-avatar";
 import { Task, TaskStatus } from "../types";

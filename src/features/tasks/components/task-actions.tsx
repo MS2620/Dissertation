@@ -18,7 +18,7 @@ interface TaskActionsProps {
   children?: React.ReactNode;
 }
 
-export const TaskActions = ({ $id, projectId, children }: TaskActionsProps) => {
+export const TaskActions = ({ $id, children }: TaskActionsProps) => {
   const router = useRouter();
   const workspaceId = useWorkspaceId();
 
@@ -41,10 +41,6 @@ export const TaskActions = ({ $id, projectId, children }: TaskActionsProps) => {
 
   const onOpenTask = () => {
     router.push(`/workspaces/${workspaceId}/tasks/${$id}`);
-  };
-
-  const onOpenProject = () => {
-    router.push(`/workspaces/${workspaceId}/projects/${projectId}`);
   };
 
   return (
