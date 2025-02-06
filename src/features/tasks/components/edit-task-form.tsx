@@ -34,18 +34,15 @@ import { useUpdateTask } from "../api/use-update-task";
 
 interface EditTaskFormProps {
   onCancel?: () => void;
-  projectId: string;
   memberOptions: { $id: string; name: string }[];
   initialValues: Task;
 }
 
 export const EditTaskForm = ({
   onCancel,
-  projectId,
   memberOptions,
   initialValues,
 }: EditTaskFormProps) => {
-  const workspaceId = useWorkspaceId();
   const { mutate, isPending } = useUpdateTask();
 
   const form = useForm<z.infer<typeof createTaskSchema>>({
