@@ -26,6 +26,7 @@ import {
 import { RegisterSchema } from "../schema";
 import { useRegister } from "../api/use-register";
 import { Loader } from "lucide-react";
+import { signUpWithGithub, signUpWithGoogle } from "@/lib/oauth";
 
 export const SignUpCard = () => {
   const { mutate, isPending } = useRegister();
@@ -129,22 +130,24 @@ export const SignUpCard = () => {
       </div>
       <CardContent className="p-7 flex flex-col gap-y-4">
         <Button
+          onClick={signUpWithGoogle}
           disabled={false}
           variant="secondary"
           size="lg"
           className="w-full"
         >
           <FcGoogle className="mr-2 size-5" />
-          Login with Google
+          Sign up with Google
         </Button>
         <Button
+          onClick={signUpWithGithub}
           disabled={false}
           variant="secondary"
           size="lg"
           className="w-full"
         >
           <FaGithub className="mr-2 size-5" />
-          Login with Github
+          Sign up with Github
         </Button>
       </CardContent>
       <div className="px-7">
