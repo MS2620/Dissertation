@@ -13,6 +13,7 @@ import { createProjectSchema, updateProjectSchema } from "../schemas";
 
 import { Project } from "../types";
 import { TaskStatus } from "@/features/tasks/types";
+import { MemberRole } from "@/features/members/types";
 
 const app = new Hono()
   .post(
@@ -56,6 +57,7 @@ const app = new Hono()
           name,
           imageUrl: uploadedImageUrl,
           workspaceId,
+          assigneeId: [member.$id],
         }
       );
 
@@ -70,14 +72,13 @@ const app = new Hono()
       "query",
       z.object({
         workspaceId: z.string(),
-        projectId: z.string().optional(),
       })
     ),
     async (c) => {
       const user = c.get("user");
       const databases = c.get("databases");
 
-      const { workspaceId, projectId } = c.req.valid("query");
+      const { workspaceId } = c.req.valid("query");
 
       const member = await getMember({
         databases,
@@ -89,25 +90,26 @@ const app = new Hono()
         return c.json({ error: "Unauthorized" }, 401);
       }
 
-      if (!projectId) {
-        const projects = await databases.listDocuments<Project>(
+      console.log(member);
+      if (member.role !== MemberRole.ADMIN) {
+        const currentProject = await databases.listDocuments<Project>(
           DATABASE_ID,
           PROJECTS_ID,
           [
             Query.orderDesc("$createdAt"),
-            Query.contains("workspaceId", workspaceId),
+            Query.contains("assigneeId", member.$id),
           ]
         );
 
-        return c.json({ data: projects });
+        return c.json({ data: currentProject });
       }
 
       const currentProject = await databases.listDocuments<Project>(
         DATABASE_ID,
         PROJECTS_ID,
         [
+          Query.orderDesc("$createdAt"),
           Query.contains("workspaceId", workspaceId),
-          Query.contains("$id", projectId),
         ]
       );
 
