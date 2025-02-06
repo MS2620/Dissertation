@@ -90,7 +90,7 @@ const app = new Hono()
       }
 
       if (!projectId) {
-        const projects = await databases.listDocuments(
+        const projects = await databases.listDocuments<Project>(
           DATABASE_ID,
           PROJECTS_ID,
           [
@@ -102,7 +102,7 @@ const app = new Hono()
         return c.json({ data: projects });
       }
 
-      const currentProject = await databases.listDocuments(
+      const currentProject = await databases.listDocuments<Project>(
         DATABASE_ID,
         PROJECTS_ID,
         [

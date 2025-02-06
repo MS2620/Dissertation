@@ -43,7 +43,7 @@ const routes = [
     href: "/members",
     icon: UsersIcon,
     activeIcon: UsersIcon,
-    adminOnly: true,
+    adminOnly: false,
   },
 ];
 

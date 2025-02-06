@@ -24,6 +24,7 @@ import { useConfirm } from "@/hooks/use-confirm";
 export const MembersList = () => {
   const workspaceId = useWorkspaceId();
   const { data } = useGetMembers({ workspaceId });
+
   const [ConfirmDialog, confirm] = useConfirm(
     "Remove Member",
     "Are you sure you want to remove this member?",
