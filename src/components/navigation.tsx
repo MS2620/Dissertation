@@ -11,6 +11,10 @@ import {
 } from "react-icons/go";
 import { useWorkspaceId } from "@/features/workspaces/hooks/use-workspace-id";
 import { usePathname } from "next/navigation";
+import { MemberRole } from "@/features/members/types";
+import { useGetMembers } from "@/features/members/api/use-get-members";
+import { useCurrent } from "@/features/auth/api/use-current";
+import { Models } from "node-appwrite";
 
 const routes = [
   {
@@ -18,34 +22,48 @@ const routes = [
     href: "",
     icon: GoHome,
     activeIcon: GoHomeFill,
+    adminOnly: false,
   },
   {
-    label: "Workspace Tasks",
+    label: "My Tasks",
     href: "/tasks",
     icon: GoCheckCircle,
     activeIcon: GoCheckCircleFill,
+    adminOnly: false,
   },
   {
     label: "Settings",
     href: "/settings",
     icon: SettingsIcon,
     activeIcon: SettingsIcon,
+    adminOnly: true,
   },
   {
     label: "Members",
     href: "/members",
     icon: UsersIcon,
     activeIcon: UsersIcon,
+    adminOnly: true,
   },
 ];
 
 export const Navigation = () => {
   const workspaceId = useWorkspaceId();
   const pathname = usePathname();
+  const { data: roles } = useGetMembers({ workspaceId });
+  const { data: user } = useCurrent();
+
+  const role = (roles?.documents as Models.Document[]).find(
+    (member) => member.userId === user?.$id
+  )?.role;
+
+  const filteredRoutes = routes.filter(
+    (route) => !route.adminOnly || role === MemberRole.ADMIN
+  );
 
   return (
     <ul className="flex flex-col">
-      {routes.map((item) => {
+      {filteredRoutes.map((item) => {
         const fullHref = `/workspaces/${workspaceId}${item.href}`;
         const isActive = pathname === fullHref;
         const Icon = isActive ? item.activeIcon : item.icon;
