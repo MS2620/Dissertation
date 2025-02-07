@@ -21,15 +21,14 @@ import { DataCalendar } from "./data-calendar";
 import { useProjectId } from "../hooks/use-project-id";
 import { useGetMembers } from "@/features/members/api/use-get-members";
 import { MemberRole } from "@/features/members/types";
+import { useCurrent } from "@/features/auth/api/use-current";
 
 interface TaskViewSwitcherProps {
   hideProjectFilter?: boolean;
-  userId?: string;
 }
 
 export const TaskViewSwitcher = ({
   hideProjectFilter,
-  userId,
 }: TaskViewSwitcherProps) => {
   const [{ status, projectId, dueDate }] = useTaskFilters();
   const [view, setView] = useQueryState("task-view", {
@@ -37,6 +36,7 @@ export const TaskViewSwitcher = ({
   });
   const workspaceId = useWorkspaceId();
   const paramProjectId = useProjectId();
+  const { data: user } = useCurrent();
 
   const { mutate: bulkUpdate } = useBulkUpdateTask();
 
@@ -62,15 +62,9 @@ export const TaskViewSwitcher = ({
     workspaceId,
   });
 
-  let isAdmin = false;
-
-  members?.documents.map((member) => {
-    if (member.userId === userId) {
-      if (member.role === MemberRole.ADMIN) {
-        isAdmin = true;
-      }
-    }
-  });
+  const isAdmin = members?.documents.some(
+    (member) => member.role === MemberRole.ADMIN && user?.$id === member.userId
+  );
 
   return (
     <Tabs
@@ -91,13 +85,12 @@ export const TaskViewSwitcher = ({
               Calendar
             </TabsTrigger>
           </TabsList>
-          {paramProjectId ||
-            (isAdmin && (
-              <Button size="sm" className="w-full lg:w-auto" onClick={open}>
-                <PlusIcon className="size-4" />
-                New Task
-              </Button>
-            ))}
+          {(isAdmin || paramProjectId) && (
+            <Button size="sm" className="w-full lg:w-auto" onClick={open}>
+              <PlusIcon className="size-4" />
+              New Task
+            </Button>
+          )}
         </div>
         <Separator className="my-4" />
         {isAdmin && (
