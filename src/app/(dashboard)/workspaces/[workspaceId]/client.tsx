@@ -5,7 +5,7 @@ import { formatDistanceToNow } from "date-fns";
 import { CalendarIcon, PlusIcon, SettingsIcon } from "lucide-react";
 
 import { Task } from "@/features/tasks/types";
-import { Member } from "@/features/members/types";
+import { Member, MemberRole } from "@/features/members/types";
 import { Project } from "@/features/projects/types";
 import { useGetTasks } from "@/features/tasks/api/use-get-tasks";
 import { MemberAvatar } from "@/features/members/components/member-avatar";
@@ -25,7 +25,7 @@ import { PageLoader } from "@/components/page-loader";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { snakeCaseToTitleCase } from "@/lib/utils";
-// import { useCurrent } from "@/features/auth/api/use-current";
+import { useCurrent } from "@/features/auth/api/use-current";
 
 export const WorkspaceIdClient = () => {
   const workspaceId = useWorkspaceId();
@@ -44,15 +44,13 @@ export const WorkspaceIdClient = () => {
     workspaceId,
   });
 
-  // const { data: user } = useCurrent();
+  const { data: user } = useCurrent();
 
-  // const isAdmin =
-  //   members?.documents.some(
-  //     (member) =>
-  //       member.role === MemberRole.ADMIN && user?.$id === member.userId
-  //   ) || false;
-
-  const isAdmin = true;
+  const isAdmin =
+    members?.documents.some(
+      (member) =>
+        member.role === MemberRole.ADMIN && user?.$id === member.userId
+    ) || false;
 
   const isLoading =
     isLoadingAnalytics ||

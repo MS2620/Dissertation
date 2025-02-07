@@ -1,7 +1,7 @@
 "use client";
-// import { useCurrent } from "@/features/auth/api/use-current";
-// import { useGetMembers } from "@/features/members/api/use-get-members";
-// import { MemberRole } from "@/features/members/types";
+import { useCurrent } from "@/features/auth/api/use-current";
+import { useGetMembers } from "@/features/members/api/use-get-members";
+import { MemberRole } from "@/features/members/types";
 import { useGetProjects } from "@/features/projects/api/use-get-projects";
 import { useCreateProjectModal } from "@/features/projects/hooks/use-create-project-modal";
 import { useWorkspaceId } from "@/features/workspaces/hooks/use-workspace-id";
@@ -14,14 +14,12 @@ export const Projects = () => {
   const workspaceId = useWorkspaceId();
   const { data } = useGetProjects({ workspaceId });
   const { open } = useCreateProjectModal();
-  // const { data: user } = useCurrent();
-  // const { data: members } = useGetMembers({ workspaceId });
+  const { data: user } = useCurrent();
+  const { data: members } = useGetMembers({ workspaceId });
 
-  // const isAdmin = members?.documents.some(
-  //   (member) => member.role === MemberRole.ADMIN && user?.$id === member.userId
-  // );
-
-  const isAdmin = true;
+  const isAdmin = members?.documents.some(
+    (member) => member.role === MemberRole.ADMIN && user?.$id === member.userId
+  );
 
   const pathname = usePathname();
 
