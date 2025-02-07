@@ -120,6 +120,7 @@ export const DataFilters = ({ hideProjectFilter }: DataFiltersProps) => {
           <SelectContent>
             <SelectItem value="all">All assignees</SelectItem>
             <SelectSeparator />
+
             {memberOptions?.map((member) => (
               <SelectItem key={member.value} value={member.value}>
                 {member.label}

@@ -117,9 +117,8 @@ const app = new Hono()
   )
 
   .get("/:projectId", sessionMiddleware, async (c) => {
-    const user = c.get("user");
+    const currentUser = c.get("user");
     const databases = c.get("databases");
-
     const { projectId } = c.req.param();
 
     const project = await databases.getDocument<Project>(
@@ -131,11 +130,19 @@ const app = new Hono()
     const member = await getMember({
       databases,
       workspaceId: project.workspaceId,
-      userId: user.$id,
+      userId: currentUser.$id,
     });
 
     if (!member) {
       return c.json({ error: "Unauthorized" }, 401);
+    }
+
+    // Check if member is in project's assigneeId array or is an admin
+    if (
+      member.role !== MemberRole.ADMIN &&
+      !project.assigneeId.includes(member.$id)
+    ) {
+      return c.json({ error: "You don't have access to this project" }, 403);
     }
 
     return c.json({ data: project });
@@ -247,6 +254,14 @@ const app = new Hono()
 
     if (!member) {
       return c.json({ error: "Unauthorized" }, 401);
+    }
+
+    // Check if member is in project's assigneeId array or is an admin
+    if (
+      member.role !== MemberRole.ADMIN &&
+      !project.assigneeId.includes(member.$id)
+    ) {
+      return c.json({ error: "You don't have access to this project" }, 403);
     }
 
     const now = new Date();

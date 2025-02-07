@@ -23,6 +23,8 @@ import { PageError } from "@/components/page-error";
 import { Separator } from "@/components/ui/separator";
 import { PageLoader } from "@/components/page-loader";
 import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { snakeCaseToTitleCase } from "@/lib/utils";
 
 export const WorkspaceIdClient = () => {
   const workspaceId = useWorkspaceId();
@@ -79,6 +81,8 @@ interface TaskListProps {
 export const TaskList = ({ data, total }: TaskListProps) => {
   const workspaceId = useWorkspaceId();
 
+  console.log(data);
+
   const { open: createTask } = useCreateTaskModal();
   return (
     <div className="flex flex-col gap-y-4 col-span-1">
@@ -96,14 +100,36 @@ export const TaskList = ({ data, total }: TaskListProps) => {
               <Link href={`/workspaces/${workspaceId}/tasks/${task.$id}`}>
                 <Card className="shadow-none rounded-lg hover:opacity-75 transition">
                   <CardContent className="p-4">
-                    <p className="text-lg font-medium truncate">{task.name}</p>
+                    <div className="flex flex-row items-center">
+                      <p className="text-lg font-medium truncate">
+                        {task.name}
+                      </p>
+                      <div className="ml-2 py-1">
+                        <Badge variant={task.status}>
+                          {snakeCaseToTitleCase(task.status)}
+                        </Badge>
+                      </div>
+                    </div>
+
                     <div className="flex items-center gap-x-2">
-                      <p>{task.project?.name}</p>
+                      <p className="text-[14px]">
+                        Project: {task.project?.name}
+                      </p>
+                      <div className="size-1 rounded-full bg-neutral-300" />
+                      <p className="text-[12px] text-muted-foreground pt-[2px]">
+                        Assignee: {task.assignee.name}
+                      </p>
                       <div className="size-1 rounded-full bg-neutral-300" />
                       <div className="text-sm text-muted-foreground flex items-center">
                         <CalendarIcon className="size-3 mr-1" />
-                        <span className="truncate">
-                          {formatDistanceToNow(new Date(task.dueDate))}
+                        <span className="truncate text-[12px] text-muted-foreground pt-[2px]">
+                          {new Date(task.dueDate) < new Date()
+                            ? `Due ${formatDistanceToNow(
+                                new Date(task.dueDate)
+                              )} ago`
+                            : `Due in ${formatDistanceToNow(
+                                new Date(task.dueDate)
+                              )}`}
                         </span>
                       </div>
                     </div>

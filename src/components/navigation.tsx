@@ -25,11 +25,11 @@ const routes = [
     adminOnly: false,
   },
   {
-    label: "My Tasks",
+    label: "Workspace Tasks",
     href: "/tasks",
     icon: GoCheckCircle,
     activeIcon: GoCheckCircleFill,
-    adminOnly: false,
+    adminOnly: true,
   },
   {
     label: "Settings",

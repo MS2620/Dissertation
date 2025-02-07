@@ -9,6 +9,7 @@ import { z } from "zod";
 import { Task, TaskStatus } from "../types";
 import { createAdminClient } from "@/lib/appwrite";
 import { Project } from "@/features/projects/types";
+import { MemberRole } from "@/features/members/types";
 
 const app = new Hono()
   .delete("/:taskId", sessionMiddleware, async (c) => {
@@ -49,7 +50,6 @@ const app = new Hono()
       z.object({
         workspaceId: z.string(),
         projectId: z.string().nullish(),
-        assigneeId: z.string().nullish(),
         status: z.nativeEnum(TaskStatus).nullish(),
         search: z.string().nullish(),
         dueDate: z.string().nullish(),
@@ -60,7 +60,7 @@ const app = new Hono()
       const databases = c.get("databases");
       const user = c.get("user");
 
-      const { workspaceId, projectId, assigneeId, status, search, dueDate } =
+      const { workspaceId, projectId, status, search, dueDate } =
         c.req.valid("query");
 
       const member = await getMember({
@@ -78,6 +78,10 @@ const app = new Hono()
         Query.orderDesc("$createdAt"),
       ];
 
+      if (member.role !== MemberRole.ADMIN) {
+        query.push(Query.equal("assigneeId", member.$id));
+      }
+
       if (projectId) {
         console.log("projectId", projectId);
         query.push(Query.equal("projectId", projectId));
@@ -86,11 +90,6 @@ const app = new Hono()
       if (status) {
         console.log("status", status);
         query.push(Query.equal("status", status));
-      }
-
-      if (assigneeId) {
-        console.log("assigneeId", assigneeId);
-        query.push(Query.equal("assigneeId", assigneeId));
       }
 
       if (dueDate) {
@@ -110,7 +109,6 @@ const app = new Hono()
       );
 
       const projectIds = tasks.documents.map((task) => task.projectId);
-
       const assigneeIds = tasks.documents.map((task) => task.assigneeId);
 
       const projects = await databases.listDocuments<Project>(
@@ -131,7 +129,6 @@ const app = new Hono()
           return { ...member, name: user.name, email: user.email };
         })
       );
-
       const populatedTasks = tasks.documents.map((task) => {
         const project = projects.documents.find(
           (project) => project.$id === task.projectId
@@ -139,7 +136,6 @@ const app = new Hono()
         const assignee = assignees.find(
           (assignee) => assignee.$id === task.assigneeId
         );
-
         return {
           ...task,
           project,
@@ -151,115 +147,118 @@ const app = new Hono()
     }
   )
 
-  .get(
-    "/all-tasks",
-    sessionMiddleware,
-    zValidator(
-      "query",
-      z.object({
-        workspaceId: z.string(),
-        projectId: z.string().nullish(),
-        assigneeId: z.string().nullish(),
-        status: z.nativeEnum(TaskStatus).nullish(),
-        search: z.string().nullish(),
-        dueDate: z.string().nullish(),
-      })
-    ),
-    async (c) => {
-      const { users } = await createAdminClient();
-      const databases = c.get("databases");
-      const user = c.get("user");
+  // .get(
+  //   "/all-tasks",
+  //   sessionMiddleware,
+  //   zValidator(
+  //     "query",
+  //     z.object({
+  //       workspaceId: z.string(),
+  //       projectId: z.string().nullish(),
+  //       assigneeId: z.string().nullish(),
+  //       status: z.nativeEnum(TaskStatus).nullish(),
+  //       search: z.string().nullish(),
+  //       dueDate: z.string().nullish(),
+  //     })
+  //   ),
+  //   async (c) => {
+  //     const { users } = await createAdminClient();
+  //     const databases = c.get("databases");
+  //     const user = c.get("user");
 
-      const { workspaceId, projectId, assigneeId, status, search, dueDate } =
-        c.req.valid("query");
+  //     const { workspaceId, projectId, assigneeId, status, search, dueDate } =
+  //       c.req.valid("query");
 
-      const member = await getMember({
-        databases,
-        workspaceId,
-        userId: user.$id,
-      });
+  //     const member = await getMember({
+  //       databases,
+  //       workspaceId,
+  //       userId: user.$id,
+  //     });
 
-      if (!member) {
-        return c.json({ error: "Unauthorized" }, 401);
-      }
+  //     if (!member) {
+  //       return c.json({ error: "Unauthorized" }, 401);
+  //     }
 
-      const query = [
-        Query.equal("workspaceId", workspaceId),
-        Query.orderDesc("$createdAt"),
-      ];
+  //     const query = [
+  //       Query.equal("workspaceId", workspaceId),
+  //       Query.equal("assigneeId", member.$id),
+  //       Query.orderDesc("$createdAt"),
+  //     ];
 
-      if (projectId) {
-        console.log("projectId", projectId);
-        query.push(Query.equal("projectId", projectId));
-      }
+  //     if (projectId) {
+  //       console.log("projectId", projectId);
+  //       query.push(Query.equal("projectId", projectId));
+  //     }
 
-      if (status) {
-        console.log("status", status);
-        query.push(Query.equal("status", status));
-      }
+  //     if (status) {
+  //       console.log("status", status);
+  //       query.push(Query.equal("status", status));
+  //     }
 
-      if (assigneeId) {
-        console.log("assigneeId", assigneeId);
-        query.push(Query.equal("assigneeId", assigneeId));
-      }
+  //     // if (assigneeId) {
+  //     //   console.log("assigneeId", assigneeId);
+  //     //   query.push(Query.equal("assigneeId", assigneeId));
+  //     // }
 
-      if (dueDate) {
-        console.log("dueDate", dueDate);
-        query.push(Query.equal("dueDate", dueDate));
-      }
+  //     if (dueDate) {
+  //       console.log("dueDate", dueDate);
+  //       query.push(Query.equal("dueDate", dueDate));
+  //     }
 
-      if (search) {
-        console.log("search", search);
-        query.push(Query.search("name", search));
-      }
+  //     if (search) {
+  //       console.log("search", search);
+  //       query.push(Query.search("name", search));
+  //     }
 
-      const tasks = await databases.listDocuments<Task>(
-        DATABASE_ID,
-        TASKS_ID,
-        query
-      );
+  //     const tasks = await databases.listDocuments<Task>(
+  //       DATABASE_ID,
+  //       TASKS_ID,
+  //       query
+  //     );
 
-      const projectIds = tasks.documents.map((task) => task.projectId);
+  //     const projectIds = tasks.documents.map((task) => task.projectId);
 
-      const assigneeIds = tasks.documents.map((task) => task.assigneeId);
+  //     const assigneeIds = tasks.documents.map((task) => task.assigneeId);
 
-      const projects = await databases.listDocuments<Project>(
-        DATABASE_ID,
-        PROJECTS_ID,
-        projectIds.length > 0 ? [Query.equal("$id", projectIds)] : []
-      );
+  //     console.log(assigneeIds);
 
-      const members = await databases.listDocuments(
-        DATABASE_ID,
-        MEMBERS_ID,
-        assigneeIds.length > 0 ? [Query.contains("$id", assigneeIds)] : []
-      );
+  //     const projects = await databases.listDocuments<Project>(
+  //       DATABASE_ID,
+  //       PROJECTS_ID,
+  //       projectIds.length > 0 ? [Query.equal("$id", projectIds)] : []
+  //     );
 
-      const assignees = await Promise.all(
-        members.documents.map(async (member) => {
-          const user = await users.get(member.userId);
-          return { ...member, name: user.name, email: user.email };
-        })
-      );
+  //     const members = await databases.listDocuments(
+  //       DATABASE_ID,
+  //       MEMBERS_ID,
+  //       assigneeIds.length > 0 ? [Query.contains("$id", assigneeIds)] : []
+  //     );
 
-      const populatedTasks = tasks.documents.map((task) => {
-        const project = projects.documents.find(
-          (project) => project.$id === task.projectId
-        );
-        const assignee = assignees.find(
-          (assignee) => assignee.$id === task.assigneeId
-        );
+  //     const assignees = await Promise.all(
+  //       members.documents.map(async (member) => {
+  //         const user = await users.get(member.userId);
+  //         return { ...member, name: user.name, email: user.email };
+  //       })
+  //     );
 
-        return {
-          ...task,
-          project,
-          assignee,
-        };
-      });
+  //     const populatedTasks = tasks.documents.map((task) => {
+  //       const project = projects.documents.find(
+  //         (project) => project.$id === task.projectId
+  //       );
+  //       const assignee = assignees.find(
+  //         (assignee) => assignee.$id === task.assigneeId
+  //       );
 
-      return c.json({ data: { ...tasks, documents: populatedTasks } });
-    }
-  )
+  //       return {
+  //         ...task,
+  //         project,
+  //         assignee,
+  //       };
+  //     });
+
+  //     return c.json({ data: { ...tasks, documents: populatedTasks } });
+  //   }
+  // )
 
   .post(
     "/",
@@ -343,6 +342,17 @@ const app = new Hono()
         return c.json({ error: "Unauthorized" }, 401);
       }
 
+      // Allow if user is admin OR if they're assigned to the task
+      if (
+        member.role !== MemberRole.ADMIN &&
+        existingTask.assigneeId !== member.$id
+      ) {
+        return c.json(
+          { error: "You don't have access to modify this task" },
+          403
+        );
+      }
+
       const task = await databases.updateDocument(
         DATABASE_ID,
         TASKS_ID,
@@ -380,6 +390,13 @@ const app = new Hono()
 
     if (!currentMember) {
       return c.json({ error: "Unauthorized" }, 401);
+    }
+
+    if (
+      currentMember.role !== MemberRole.ADMIN &&
+      task.assigneeId !== currentMember.$id
+    ) {
+      return c.json({ error: "You don't have access to this task" }, 403);
     }
 
     const project = await databases.getDocument<Project>(

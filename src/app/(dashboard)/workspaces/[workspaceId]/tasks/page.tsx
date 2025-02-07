@@ -5,6 +5,7 @@ import { TaskViewSwitcher } from "@/features/tasks/components/task-view-switcher
 
 const TasksPage = async () => {
   const user = await getCurrent();
+
   if (!user) {
     redirect("/sign-in");
   }
