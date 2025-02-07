@@ -16,7 +16,7 @@ import {
 } from "@/config";
 
 import { getMember } from "@/features/members/utils";
-import { MemberRole } from "@/features/members/types";
+import { Member, MemberRole } from "@/features/members/types";
 import { TaskStatus } from "@/features/tasks/types";
 
 import { Workspace } from "../types";
@@ -27,9 +27,11 @@ const app = new Hono()
     const user = c.get("user");
     const databases = c.get("databases");
 
-    const members = await databases.listDocuments(DATABASE_ID, MEMBERS_ID, [
-      Query.equal("userId", user.$id),
-    ]);
+    const members = await databases.listDocuments<Member>(
+      DATABASE_ID,
+      MEMBERS_ID,
+      [Query.equal("userId", user.$id)]
+    );
 
     if (members.total === 0) {
       return c.json({ data: { documents: [], total: 0 } });

@@ -4,14 +4,20 @@ import { client } from "@/lib/rpc";
 
 interface useGetMembersProps {
   workspaceId: string;
+  projectId?: string;
 }
 
-export const useGetMembers = ({ workspaceId }: useGetMembersProps) => {
+export const useGetMembers = ({
+  workspaceId,
+  projectId,
+}: useGetMembersProps) => {
   const query = useQuery({
-    queryKey: ["members", workspaceId],
+    queryKey: ["members", workspaceId, projectId],
     queryFn: async () => {
+      const query = projectId ? { workspaceId, projectId } : { workspaceId };
+
       const response = await client.api.members.$get({
-        query: { workspaceId },
+        query,
       });
 
       if (!response.ok) {

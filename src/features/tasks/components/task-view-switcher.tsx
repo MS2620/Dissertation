@@ -19,13 +19,17 @@ import { TaskStatus } from "../types";
 import { useBulkUpdateTask } from "../api/use-bulk-update-tasks";
 import { DataCalendar } from "./data-calendar";
 import { useProjectId } from "../hooks/use-project-id";
+import { useGetMembers } from "@/features/members/api/use-get-members";
+import { MemberRole } from "@/features/members/types";
 
 interface TaskViewSwitcherProps {
   hideProjectFilter?: boolean;
+  userId?: string;
 }
 
 export const TaskViewSwitcher = ({
   hideProjectFilter,
+  userId,
 }: TaskViewSwitcherProps) => {
   const [{ status, projectId, dueDate }] = useTaskFilters();
   const [view, setView] = useQueryState("task-view", {
@@ -54,6 +58,20 @@ export const TaskViewSwitcher = ({
 
   const { open } = useCreateTaskModal();
 
+  const { data: members } = useGetMembers({
+    workspaceId,
+  });
+
+  let isAdmin = false;
+
+  members?.documents.map((member) => {
+    if (member.userId === userId) {
+      if (member.role === MemberRole.ADMIN) {
+        isAdmin = true;
+      }
+    }
+  });
+
   return (
     <Tabs
       defaultValue={view}
@@ -73,14 +91,21 @@ export const TaskViewSwitcher = ({
               Calendar
             </TabsTrigger>
           </TabsList>
-          <Button size="sm" className="w-full lg:w-auto" onClick={open}>
-            <PlusIcon className="size-4" />
-            New Task
-          </Button>
+          {paramProjectId ||
+            (isAdmin && (
+              <Button size="sm" className="w-full lg:w-auto" onClick={open}>
+                <PlusIcon className="size-4" />
+                New Task
+              </Button>
+            ))}
         </div>
         <Separator className="my-4" />
-        <DataFilters hideProjectFilter={hideProjectFilter} />
-        <Separator className="my-4" />
+        {isAdmin && (
+          <>
+            <DataFilters hideProjectFilter={hideProjectFilter} />
+            <Separator className="my-4" />
+          </>
+        )}
         {isLoadingTasks ? (
           <div className="w-full border rounded-lg h-[200px] flex flex-col items-center justify-center">
             <Loader className="size-5 animate-spin text-muted-foreground" />

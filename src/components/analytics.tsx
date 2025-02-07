@@ -36,15 +36,6 @@ export const Analytics = ({ data }: ProjectAnalyticsResponseType) => {
         <Separator orientation="vertical" />
         <div className="flex items-center flex-1">
           <AnalyticsCard
-            title="Completed Tasks"
-            value={data.completeTaskCount}
-            variant={data.completeTaskDifference > 0 ? "increase" : "decrease"}
-            increaseValue={data.completeTaskDifference}
-          />
-        </div>
-        <Separator orientation="vertical" />
-        <div className="flex items-center flex-1">
-          <AnalyticsCard
             title="Overdue Tasks"
             value={data.overdueTaskCount}
             variant={data.overdueTaskDifference > 0 ? "increase" : "decrease"}

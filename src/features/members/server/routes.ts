@@ -4,7 +4,7 @@ import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
 import { z } from "zod";
 import { getMember } from "../utils";
-import { DATABASE_ID, MEMBERS_ID } from "@/config";
+import { DATABASE_ID, MEMBERS_ID, PROJECTS_ID } from "@/config";
 import { Query } from "node-appwrite";
 import { Member, MemberRole } from "../types";
 
@@ -12,12 +12,15 @@ const app = new Hono()
   .get(
     "/",
     sessionMiddleware,
-    zValidator("query", z.object({ workspaceId: z.string() })),
+    zValidator(
+      "query",
+      z.object({ workspaceId: z.string(), projectId: z.string().optional() })
+    ),
     async (c) => {
       const { users } = await createAdminClient();
       const databases = c.get("databases");
       const user = c.get("user");
-      const { workspaceId } = c.req.valid("query");
+      const { workspaceId, projectId } = c.req.valid("query");
 
       const member = await getMember({
         databases,
@@ -29,10 +32,44 @@ const app = new Hono()
         return c.json({ error: "Unauthorized" }, 401);
       }
 
-      const members = await databases.listDocuments<Member>(DATABASE_ID, MEMBERS_ID, [
-        Query.equal("workspaceId", workspaceId),
-      ]);
+      const members = await databases.listDocuments<Member>(
+        DATABASE_ID,
+        MEMBERS_ID,
+        [Query.equal("workspaceId", workspaceId)]
+      );
 
+      if (member.role !== MemberRole.ADMIN) {
+        if (projectId) {
+          const project = await databases.getDocument(
+            DATABASE_ID,
+            PROJECTS_ID,
+            projectId
+          );
+
+          members.documents = members.documents.filter((member) =>
+            project.assigneeId.includes(member.$id)
+          );
+
+          const populatedMembers = await Promise.all(
+            members.documents.map(async (member) => {
+              const user = await users.get(member.userId);
+              return {
+                ...member,
+                name: user.name,
+                email: user.email,
+              };
+            })
+          );
+
+          return c.json({
+            data: { ...members, documents: populatedMembers },
+          });
+        }
+
+        return c.json({
+          data: { ...members, documents: [] },
+        });
+      }
       const populatedMembers = await Promise.all(
         members.documents.map(async (member) => {
           const user = await users.get(member.userId);

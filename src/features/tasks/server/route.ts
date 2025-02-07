@@ -78,12 +78,11 @@ const app = new Hono()
         Query.orderDesc("$createdAt"),
       ];
 
-      if (member.role !== MemberRole.ADMIN) {
+      if (member.role !== MemberRole.ADMIN && !projectId) {
         query.push(Query.equal("assigneeId", member.$id));
       }
 
       if (projectId) {
-        console.log("projectId", projectId);
         query.push(Query.equal("projectId", projectId));
       }
 

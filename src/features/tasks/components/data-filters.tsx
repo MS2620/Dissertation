@@ -1,5 +1,4 @@
 import { Select, SelectSeparator } from "@/components/ui/select";
-import { useGetMembers } from "@/features/members/api/use-get-members";
 import { useWorkspaceId } from "@/features/workspaces/hooks/use-workspace-id";
 import {
   SelectContent,
@@ -7,7 +6,7 @@ import {
   SelectValue,
   SelectItem,
 } from "@/components/ui/select";
-import { FolderIcon, ListChecksIcon, Loader, UserIcon } from "lucide-react";
+import { FolderIcon, ListChecksIcon, Loader } from "lucide-react";
 import { TaskStatus } from "../types";
 import { useTaskFilters } from "../hooks/use-task-filters";
 import { DatePicker } from "@/components/date-picker";
@@ -23,31 +22,17 @@ export const DataFilters = ({ hideProjectFilter }: DataFiltersProps) => {
   const { data: projects, isLoading: isLoadingProjects } = useGetProjects({
     workspaceId,
   });
-  const { data: members, isLoading: isLoadingMembers } = useGetMembers({
-    workspaceId,
-  });
-
-  const isLoading = isLoadingProjects || isLoadingMembers;
+  const isLoading = isLoadingProjects;
 
   const projectOptions = projects?.documents.map((project) => ({
     value: project.$id,
     label: project.name,
   }));
 
-  const memberOptions = members?.documents.map((member) => ({
-    value: member.$id,
-    label: member.name,
-  }));
-
-  const [{ status, assigneeId, projectId, dueDate }, setFilters] =
-    useTaskFilters();
+  const [{ status, projectId, dueDate }, setFilters] = useTaskFilters();
 
   const onStatusChange = (value: string) => {
     setFilters({ status: value === "all" ? null : (value as TaskStatus) });
-  };
-
-  const onAssigneeChange = (value: string) => {
-    setFilters({ assigneeId: value === "all" ? null : (value as string) });
   };
 
   const onProjectChange = (value: string) => {
@@ -101,29 +86,6 @@ export const DataFilters = ({ hideProjectFilter }: DataFiltersProps) => {
             {projectOptions?.map((project) => (
               <SelectItem key={project.value} value={project.value}>
                 {project.label}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      )}
-      {memberOptions && (
-        <Select
-          defaultValue={assigneeId ?? undefined}
-          onValueChange={(value) => onAssigneeChange(value)}
-        >
-          <SelectTrigger className="w-full lg:w-auto h-8">
-            <div className="flex items-center pr-2">
-              <UserIcon className="size-4 mr-2" />
-              <SelectValue placeholder="All assignees" />
-            </div>
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All assignees</SelectItem>
-            <SelectSeparator />
-
-            {memberOptions?.map((member) => (
-              <SelectItem key={member.value} value={member.value}>
-                {member.label}
               </SelectItem>
             ))}
           </SelectContent>

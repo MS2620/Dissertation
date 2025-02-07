@@ -5,7 +5,7 @@ import { formatDistanceToNow } from "date-fns";
 import { CalendarIcon, PlusIcon, SettingsIcon } from "lucide-react";
 
 import { Task } from "@/features/tasks/types";
-import { Member } from "@/features/members/types";
+import { Member, MemberRole } from "@/features/members/types";
 import { Project } from "@/features/projects/types";
 import { useGetTasks } from "@/features/tasks/api/use-get-tasks";
 import { MemberAvatar } from "@/features/members/components/member-avatar";
@@ -25,6 +25,7 @@ import { PageLoader } from "@/components/page-loader";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { snakeCaseToTitleCase } from "@/lib/utils";
+import { useCurrent } from "@/features/auth/api/use-current";
 
 export const WorkspaceIdClient = () => {
   const workspaceId = useWorkspaceId();
@@ -43,7 +44,13 @@ export const WorkspaceIdClient = () => {
     workspaceId,
   });
 
-  console.log(members);
+  const { data: user } = useCurrent();
+
+  const isAdmin =
+    members?.documents.some(
+      (member) =>
+        member.role === MemberRole.ADMIN && user?.$id === member.userId
+    ) || false;
 
   const isLoading =
     isLoadingAnalytics ||
@@ -64,9 +71,17 @@ export const WorkspaceIdClient = () => {
       <Analytics data={analytics} />
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
         <TaskList data={tasks.documents} total={tasks.total} />
-        <ProjectList data={projects.documents} total={projects.total} />
+        <ProjectList
+          isAdmin={isAdmin}
+          data={projects.documents}
+          total={projects.total}
+        />
         {members && (
-          <MembersList data={members.documents} total={members.total} />
+          <MembersList
+            isAdmin={isAdmin}
+            data={members.documents}
+            total={members.total}
+          />
         )}
       </div>
     </div>
@@ -80,8 +95,6 @@ interface TaskListProps {
 
 export const TaskList = ({ data, total }: TaskListProps) => {
   const workspaceId = useWorkspaceId();
-
-  console.log(data);
 
   const { open: createTask } = useCreateTaskModal();
   return (
@@ -153,9 +166,10 @@ export const TaskList = ({ data, total }: TaskListProps) => {
 interface ProjectListProps {
   data: Project[];
   total: number;
+  isAdmin: boolean;
 }
 
-export const ProjectList = ({ data, total }: ProjectListProps) => {
+export const ProjectList = ({ data, total, isAdmin }: ProjectListProps) => {
   const workspaceId = useWorkspaceId();
 
   const { open: createProject } = useCreateProjectModal();
@@ -164,9 +178,11 @@ export const ProjectList = ({ data, total }: ProjectListProps) => {
       <div className="bg-white border rounded-lg p-4">
         <div className="flex items-center justify-between">
           <p className="text-lg font-semibold">Projects ({total})</p>
-          <Button variant="secondary" onClick={() => createProject()}>
-            <PlusIcon className="size-4 text-neutral-400" />
-          </Button>
+          {isAdmin && (
+            <Button variant="secondary" onClick={() => createProject()}>
+              <PlusIcon className="size-4 text-neutral-400" />
+            </Button>
+          )}
         </div>
         <Separator className="my-4" />
         <ul className="grid grid-cols-1 lg:grid-cols-2 gap-4">
@@ -200,10 +216,13 @@ export const ProjectList = ({ data, total }: ProjectListProps) => {
 interface MembersListProps {
   data: Member[];
   total: number;
+  isAdmin: boolean;
 }
 
-export const MembersList = ({ data, total }: MembersListProps) => {
+export const MembersList = ({ data, total, isAdmin }: MembersListProps) => {
   const workspaceId = useWorkspaceId();
+
+  if (!isAdmin) return null;
 
   return (
     <div className="flex flex-col gap-y-4 col-span-1">

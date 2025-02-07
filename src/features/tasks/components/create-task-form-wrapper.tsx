@@ -22,7 +22,10 @@ export const CreateTaskFormWrapper = ({
 
   const { data: members, isLoading: isLoadingMembers } = useGetMembers({
     workspaceId,
+    projectId,
   });
+
+  console.log("members", members);
 
   const projectOptions = projects?.documents.map((project) => ({
     value: project.$id,

@@ -16,7 +16,7 @@ import { useGetMembers } from "@/features/members/api/use-get-members";
 import { useCurrent } from "@/features/auth/api/use-current";
 import { Models } from "node-appwrite";
 
-const routes = [
+const getRoutes = (isAdmin: boolean) => [
   {
     label: "Home",
     href: "",
@@ -25,11 +25,11 @@ const routes = [
     adminOnly: false,
   },
   {
-    label: "Workspace Tasks",
+    label: isAdmin ? "Workspace Tasks" : "My Tasks",
     href: "/tasks",
     icon: GoCheckCircle,
     activeIcon: GoCheckCircleFill,
-    adminOnly: true,
+    adminOnly: false,
   },
   {
     label: "Settings",
@@ -43,7 +43,7 @@ const routes = [
     href: "/members",
     icon: UsersIcon,
     activeIcon: UsersIcon,
-    adminOnly: false,
+    adminOnly: true,
   },
 ];
 
@@ -57,9 +57,10 @@ export const Navigation = () => {
     (member) => member.userId === user?.$id
   )?.role;
 
-  const filteredRoutes = routes.filter(
-    (route) => !route.adminOnly || role === MemberRole.ADMIN
-  );
+  const isAdmin = role === MemberRole.ADMIN;
+  const routes = getRoutes(isAdmin);
+
+  const filteredRoutes = routes.filter((route) => !route.adminOnly || isAdmin);
 
   return (
     <ul className="flex flex-col">

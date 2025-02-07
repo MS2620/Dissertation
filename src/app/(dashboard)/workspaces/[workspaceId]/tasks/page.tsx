@@ -12,7 +12,7 @@ const TasksPage = async () => {
 
   return (
     <div className="h-full flex flex-col">
-      <TaskViewSwitcher />
+      <TaskViewSwitcher userId={user.$id} />
     </div>
   );
 };
