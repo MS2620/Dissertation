@@ -13,11 +13,7 @@ import { PageError } from "@/components/page-error";
 import { PageLoader } from "@/components/page-loader";
 import { useGetProjectAnalytics } from "@/features/projects/api/use-get-project-analytics";
 
-interface ProjectIdClientProps {
-  userId: string;
-}
-
-export const ProjectIdClient = ({ userId }: ProjectIdClientProps) => {
+export const ProjectIdClient = () => {
   const projectId = useProjectId();
 
   const { data: project, isLoading: isLoadingProject } = useGetProject({
@@ -55,7 +51,7 @@ export const ProjectIdClient = ({ userId }: ProjectIdClientProps) => {
         </div>
       </div>
       {analyticsData ? <Analytics data={analyticsData} /> : null}
-      <TaskViewSwitcher userId={userId} hideProjectFilter />
+      <TaskViewSwitcher hideProjectFilter />
     </div>
   );
 };

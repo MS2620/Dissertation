@@ -7,7 +7,7 @@ const ProjectIdPage = async () => {
   const user = await getCurrent();
   if (!user) redirect("/sign-in");
 
-  return <ProjectIdClient userId={user.$id} />;
+  return <ProjectIdClient />;
 };
 
 export default ProjectIdPage;

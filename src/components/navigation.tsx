@@ -14,7 +14,6 @@ import { usePathname } from "next/navigation";
 import { MemberRole } from "@/features/members/types";
 import { useGetMembers } from "@/features/members/api/use-get-members";
 import { useCurrent } from "@/features/auth/api/use-current";
-import { Models } from "node-appwrite";
 
 const getRoutes = (isAdmin: boolean) => [
   {
@@ -50,14 +49,15 @@ const getRoutes = (isAdmin: boolean) => [
 export const Navigation = () => {
   const workspaceId = useWorkspaceId();
   const pathname = usePathname();
-  const { data: roles } = useGetMembers({ workspaceId });
   const { data: user } = useCurrent();
+  const { data: members } = useGetMembers({ workspaceId });
 
-  const role = (roles?.documents as Models.Document[]).find(
-    (member) => member.userId === user?.$id
-  )?.role;
+  const isAdmin =
+    members?.documents.some(
+      (member) =>
+        member.role === MemberRole.ADMIN && user?.$id === member.userId
+    ) ?? false;
 
-  const isAdmin = role === MemberRole.ADMIN;
   const routes = getRoutes(isAdmin);
 
   const filteredRoutes = routes.filter((route) => !route.adminOnly || isAdmin);
