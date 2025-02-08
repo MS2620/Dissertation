@@ -130,7 +130,7 @@ export const SignUpCard = () => {
       </div>
       <CardContent className="p-7 flex flex-col gap-y-4">
         <Button
-          onClick={signUpWithGoogle}
+          onClick={() => signUpWithGoogle()}
           disabled={false}
           variant="secondary"
           size="lg"
@@ -140,7 +140,7 @@ export const SignUpCard = () => {
           Sign up with Google
         </Button>
         <Button
-          onClick={signUpWithGithub}
+          onClick={() => signUpWithGithub()}
           disabled={false}
           variant="secondary"
           size="lg"
