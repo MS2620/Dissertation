@@ -20,3 +20,7 @@ export const updateProjectSchema = z.object({
     ])
     .optional(),
 });
+
+export const addMemberSchema = z.object({
+  userId: z.string(),
+});
