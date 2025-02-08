@@ -96,40 +96,38 @@ export const SignInCard = () => {
         <Separator />
       </div>
       <CardContent className="p-7 flex flex-col gap-y-4">
-        <form action={signUpWithGoogle}>
-          <Button
-            disabled={isPending}
-            variant="secondary"
-            size="lg"
-            className="w-full"
-          >
-            <FcGoogle className="mr-2 size-5" />
-            {isPending ? (
-              <>
-                <Loader className="animate-spin size-10" /> Loading...
-              </>
-            ) : (
-              "Login with Google"
-            )}
-          </Button>
-        </form>
-        <form action={signUpWithGithub}>
-          <Button
-            disabled={isPending}
-            variant="secondary"
-            size="lg"
-            className="w-full"
-          >
-            <FaGithub className="mr-2 size-5" />
-            {isPending ? (
-              <>
-                <Loader className="animate-spin size-10" /> Loading...
-              </>
-            ) : (
-              "Login with Github"
-            )}
-          </Button>
-        </form>
+        <Button
+          onClick={() => signUpWithGoogle()}
+          disabled={isPending}
+          variant="secondary"
+          size="lg"
+          className="w-full"
+        >
+          <FcGoogle className="mr-2 size-5" />
+          {isPending ? (
+            <>
+              <Loader className="animate-spin size-10" /> Loading...
+            </>
+          ) : (
+            "Login with Google"
+          )}
+        </Button>
+        <Button
+          onClick={() => signUpWithGithub()}
+          disabled={isPending}
+          variant="secondary"
+          size="lg"
+          className="w-full"
+        >
+          <FaGithub className="mr-2 size-5" />
+          {isPending ? (
+            <>
+              <Loader className="animate-spin size-10" /> Loading...
+            </>
+          ) : (
+            "Login with Github"
+          )}
+        </Button>
       </CardContent>
       <div className="px-7">
         <Separator />
