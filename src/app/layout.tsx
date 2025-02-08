@@ -24,8 +24,10 @@ export default function RootLayout({
       <body className={cn(inter.className, "antialiased min-h-screen")}>
         <Providers>
           <Toaster />
-          <SpeedInsights />
-          <NuqsAdapter>{children}</NuqsAdapter>
+          <NuqsAdapter>
+            <SpeedInsights />
+            {children}
+          </NuqsAdapter>
         </Providers>
       </body>
     </html>
