@@ -1,8 +1,65 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Team Management Tool
 
-## Getting Started
+A modern web application for efficient team management and collaboration built with Next.js 14. This project is being built for my Dissertation.
 
-First, run the development server:
+## 🚀 Features
+
+- User Authentication
+- Team Creation and Management
+- Task Assignment and Tracking
+- Real-time Updates
+- Responsive Design
+- Modern UI/UX with Geist Font
+
+## 💻 Tech Stack
+
+- [Next.js 14](https://nextjs.org)
+- TypeScript
+- React
+- [Appwrite](https://appwrite.io)
+- Vercel Deployment
+- [Geist Font](https://vercel.com/font)
+
+## 🛠️ Getting Started
+
+1. Clone the repository
+2. Install dependencies:
+
+```bash
+npm install
+# or
+yarn install
+# or
+pnpm install
+```
+
+3. Create an appwrite project with the following database structure
+
+```bash
+WORKSPACES_ID
+MEMBERS_ID
+PROJECTS_ID
+TASKS_ID
+```
+
+4. Create .env.local file and populate the following fields
+
+```bash
+NEXT_PUBLIC_APP_URL
+
+NEXT_PUBLIC_APPWRITE_ENDPOINT
+NEXT_PUBLIC_APPWRITE_PROJECT_ID
+NEXT_PUBLIC_APPWRITE_DATABASE_ID
+NEXT_PUBLIC_APPWRITE_WORKSPACES_ID
+NEXT_PUBLIC_APPWRITE_MEMBERS_ID
+NEXT_PUBLIC_APPWRITE_PROJECTS_ID
+NEXT_PUBLIC_APPWRITE_TASKS_ID
+NEXT_PUBLIC_APPWRITE_STORAGE_ID
+
+NEXT_APPWRITE_KEY
+```
+
+5. Start the development server:
 
 ```bash
 npm run dev
@@ -10,27 +67,31 @@ npm run dev
 yarn dev
 # or
 pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+6. Open [http://localhost:3000](http://localhost:3000) in your browser
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 📝 Development
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- Edit any `page.tsx | client.tsx | layout.tsx` inside `src/app` to modify the app
+- Changes are reflected immediately with hot reloading
+- Project uses Next.js App Router architecture
 
-## Learn More
+## 📚 Documentation
 
-To learn more about Next.js, take a look at the following resources:
+For detailed information, refer to:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- [Next.js Documentation](https://nextjs.org/docs)
+- [Next.js Learning Guide](https://nextjs.org/learn)
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## 🚀 Deployment
 
-## Deploy on Vercel
+Deploy easily with [Vercel](https://vercel.com/new?utm_medium=default-template&filter=next.js):
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+1. Push your code to GitHub
+2. Import your repository to Vercel
+3. Deploy automatically
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## 📄 License
+
+This project is under the MIT License.

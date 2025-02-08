@@ -374,7 +374,7 @@ export const EditProjectForm = ({
       )}
 
       {nonProjectMembers && (
-        <Card>
+        <Card className="w-full h-full border-none shadow-none">
           <CardContent>
             <div className="flex flex-col gap-y-4 p-7">
               <h3 className="font-bold">Project Members</h3>
