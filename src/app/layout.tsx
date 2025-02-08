@@ -5,6 +5,7 @@ import "./globals.css";
 import Providers from "@/components/query-provider";
 import { Toaster } from "@/components/ui/sonner";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -23,6 +24,7 @@ export default function RootLayout({
       <body className={cn(inter.className, "antialiased min-h-screen")}>
         <Providers>
           <Toaster />
+          <SpeedInsights />
           <NuqsAdapter>{children}</NuqsAdapter>
         </Providers>
       </body>
