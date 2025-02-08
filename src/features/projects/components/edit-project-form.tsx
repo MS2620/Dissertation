@@ -1,9 +1,9 @@
 "use client";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { updateProjectSchema } from "../schemas";
+import { addMemberSchema, updateProjectSchema } from "../schemas";
 import { z } from "zod";
-import { useRef } from "react";
+import { Fragment, useRef } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Form,
@@ -16,7 +16,12 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { ArrowLeftIcon, ImageIcon, Loader } from "lucide-react";
+import {
+  ArrowLeftIcon,
+  ImageIcon,
+  Loader,
+  MoreVerticalIcon,
+} from "lucide-react";
 import Image from "next/image";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { useRouter } from "next/navigation";
@@ -25,6 +30,24 @@ import { Project } from "../types";
 import { useUpdateProject } from "../api/use-update-project";
 import { useDeleteProject } from "../api/use-delete-project";
 import { useConfirm } from "@/hooks/use-confirm";
+import {
+  Select,
+  SelectContent,
+  SelectValue,
+  SelectItem,
+  SelectTrigger,
+} from "@/components/ui/select";
+import { useGetNonProjectMembers } from "@/features/members/api/use-get-non-project-members";
+import { MemberAvatar } from "@/features/members/components/member-avatar";
+import { useAddMemberToProject } from "../api/use-add-member-to-project";
+import { useGetProjectMembers } from "../api/use-get-project-members";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { useDeleteProjectMember } from "../api/use-remove-member";
 
 interface EditProjectFormProps {
   onCancel?: () => void;
@@ -39,10 +62,26 @@ export const EditProjectForm = ({
   const { mutate, isPending } = useUpdateProject();
   const { mutate: deleteProject, isPending: isDeletingProject } =
     useDeleteProject();
+  const { mutate: addMember } = useAddMemberToProject();
+  const { data: nonProjectMembers } = useGetNonProjectMembers({
+    workspaceId: initialValues.workspaceId,
+    projectId: initialValues.$id,
+  });
+  const { data: members } = useGetProjectMembers({
+    projectId: initialValues.$id,
+  });
+  const { mutate: deleteMember, isPending: isDeletingMember } =
+    useDeleteProjectMember();
 
   const [DeleteDialog, confirmDelete] = useConfirm(
     "Delete Workspace",
     "Are you sure you want to delete this workspace? This action is irreversible.",
+    "destructive"
+  );
+
+  const [ConfirmDialog, confirm] = useConfirm(
+    "Remove Member",
+    "Are you sure you want to remove this member from the project?",
     "destructive"
   );
 
@@ -53,6 +92,13 @@ export const EditProjectForm = ({
     defaultValues: {
       ...initialValues,
       image: initialValues.imageUrl || "",
+    },
+  });
+
+  const nonProjectMembersform = useForm<z.infer<typeof addMemberSchema>>({
+    resolver: zodResolver(addMemberSchema),
+    defaultValues: {
+      userId: "",
     },
   });
 
@@ -87,6 +133,43 @@ export const EditProjectForm = ({
     if (file) {
       form.setValue("image", file);
     }
+  };
+
+  const onMemberChange = (value: string) => {
+    nonProjectMembersform.setValue("userId", value);
+  };
+
+  const onAddMemberSubmit = (values: z.infer<typeof addMemberSchema>) => {
+    const finalValues = {
+      ...values,
+      userId: values.userId,
+    };
+
+    addMember(
+      { form: finalValues, param: { projectId: initialValues.$id } },
+      {
+        onSuccess: () => {
+          window.location.reload();
+        },
+      }
+    );
+  };
+
+  const handleDeleteMember = async (userId: string) => {
+    const ok = await confirm();
+
+    if (!ok) {
+      return;
+    }
+
+    deleteMember(
+      { param: { projectId: initialValues.$id }, query: { userId } },
+      {
+        onSuccess: () => {
+          window.location.reload();
+        },
+      }
+    );
   };
 
   return (
@@ -233,6 +316,108 @@ export const EditProjectForm = ({
           </Form>
         </CardContent>
       </Card>
+
+      {members && (
+        <Card>
+          <ConfirmDialog />
+          <CardHeader className="flex flex-row items-center gap-x-4 p-7 space-y-0">
+            <CardTitle className="text-xl font-bold">
+              Project Members List
+            </CardTitle>
+          </CardHeader>
+          <div className="px-7">
+            <Separator />
+          </div>
+          <CardContent className="p-7">
+            {members?.map((member, index) => (
+              <Fragment key={member.$id}>
+                <div className="flex items-center gap-2">
+                  <MemberAvatar
+                    className="size-10"
+                    fallbackClassName="text-lg"
+                    name={member.name}
+                  />
+                  <div className="flex flex-col">
+                    <p className="text-sm font-medium">{member.name}</p>
+                    <p className="text-xs text-muted-foreground">
+                      {member.email}
+                    </p>
+                  </div>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button
+                        className="ml-auto"
+                        variant="secondary"
+                        size="icon"
+                      >
+                        <MoreVerticalIcon className="size-4 text-muted-foreground" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent side="bottom" align="end">
+                      <DropdownMenuItem
+                        className="font-medium text-amber-700"
+                        onClick={() => handleDeleteMember(member.$id)}
+                        disabled={isDeletingMember}
+                      >
+                        Remove {member.name}
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </div>
+                {index !== members.length - 1 && (
+                  <Separator className="my-2.5" />
+                )}
+              </Fragment>
+            ))}
+          </CardContent>
+        </Card>
+      )}
+
+      {nonProjectMembers && (
+        <Card>
+          <CardContent>
+            <div className="flex flex-col gap-y-4 p-7">
+              <h3 className="font-bold">Project Members</h3>
+              <p className="text-sm text-muted-foreground">
+                Add members to this project.
+              </p>
+              <Separator className="my-2" />
+              <Form {...form}>
+                <form
+                  onSubmit={nonProjectMembersform.handleSubmit(
+                    onAddMemberSubmit
+                  )}
+                >
+                  <Select onValueChange={(value) => onMemberChange(value)}>
+                    <SelectTrigger className="w-full lg:w-auto h-10">
+                      <SelectValue placeholder="All non project members" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {nonProjectMembers?.documents.map((member) => (
+                        <SelectItem key={member.$id} value={member.$id}>
+                          <div className="flex flex-row items-center gap-x-2">
+                            <MemberAvatar
+                              className="size-8"
+                              fallbackClassName="text-lg"
+                              name={member.name}
+                            />
+                            {member.name}
+                          </div>
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <div className="flex justify-end">
+                    <Button className="mt-4" type="submit">
+                      Add Member
+                    </Button>
+                  </div>
+                </form>
+              </Form>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       <Card className="w-full h-full border-none shadow-none">
         <CardContent className="p-7">
