@@ -15,7 +15,7 @@ const AuthLayout = ({ children }: AuthLayoutProps) => {
   const isSignIn = pathname === "/sign-in";
 
   return (
-    <main className="bg-neutral-100 min-h-screen">
+    <main className="bg-neutral-100 dark:bg-neutral-600 min-h-screen">
       <div className="mx-auto max-w-screen-2xl p-4">
         <nav className="flex justify-between items-center">
           <Image src={Logo} alt="logo" width={124} height={56} />

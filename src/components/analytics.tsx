@@ -5,7 +5,7 @@ import { Separator } from "@/components/ui/separator";
 
 export const Analytics = ({ data }: ProjectAnalyticsResponseType) => {
   return (
-    <ScrollArea className="border rounded-lg w-full whitespace-nowrap shrink-0">
+    <ScrollArea className="border dark:border-neutral-700 rounded-lg w-full whitespace-nowrap shrink-0">
       <div className="w-full flex flex-row min-h-full">
         <div className="flex items-center flex-1">
           <AnalyticsCard
@@ -54,7 +54,7 @@ export const Analytics = ({ data }: ProjectAnalyticsResponseType) => {
           />
         </div>
       </div>
-      <ScrollBar orientation="horizontal" />
+      <ScrollBar orientation="horizontal" className="dark:before:black" />
     </ScrollArea>
   );
 };

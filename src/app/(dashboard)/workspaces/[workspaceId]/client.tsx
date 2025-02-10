@@ -102,16 +102,16 @@ export const TaskList = ({ data, total }: TaskListProps) => {
       <div className="bg-muted rounded-lg p-4">
         <div className="flex items-center justify-between">
           <p className="text-lg font-semibold">Tasks ({total})</p>
-          <Button variant="outline" onClick={() => createTask()}>
+          <Button onClick={() => createTask()}>
             <PlusIcon className="size-4 text-neutral-400" />
           </Button>
         </div>
-        <Separator className="my-4" />
+        <Separator className="my-4 dark:bg-neutral-700" />
         <ul className="flex flex-col gap-y-4">
           {data.map((task) => (
             <li key={task.$id}>
               <Link href={`/workspaces/${workspaceId}/tasks/${task.$id}`}>
-                <Card className="shadow-none rounded-lg hover:opacity-75 transition">
+                <Card className="shadow-none rounded-lg hover:opacity-75 transition dark:bg-neutral-700">
                   <CardContent className="p-4">
                     <div className="flex flex-row items-center">
                       <p className="text-lg font-medium truncate">
@@ -155,7 +155,7 @@ export const TaskList = ({ data, total }: TaskListProps) => {
             No tasks found.
           </li>
         </ul>
-        <Button variant="outline" className="mt-4 w-full" asChild>
+        <Button className="mt-4 w-full" asChild>
           <Link href={`/workspaces/${workspaceId}/tasks`}>Show All</Link>
         </Button>
       </div>
@@ -175,21 +175,21 @@ export const ProjectList = ({ data, total, isAdmin }: ProjectListProps) => {
   const { open: createProject } = useCreateProjectModal();
   return (
     <div className="flex flex-col gap-y-4 col-span-1">
-      <div className="bg-white border rounded-lg p-4">
+      <div className="bg-white border rounded-lg p-4 dark:bg-neutral-800">
         <div className="flex items-center justify-between">
           <p className="text-lg font-semibold">Projects ({total})</p>
           {isAdmin && (
-            <Button variant="secondary" onClick={() => createProject()}>
+            <Button onClick={() => createProject()}>
               <PlusIcon className="size-4 text-neutral-400" />
             </Button>
           )}
         </div>
-        <Separator className="my-4" />
+        <Separator className="my-4 dark:bg-neutral-700" />
         <ul className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           {data.map((project) => (
             <li key={project.$id}>
               <Link href={`/workspaces/${workspaceId}/projects/${project.$id}`}>
-                <Card className="shadow-none rounded-lg hover:opacity-75 transition">
+                <Card className="shadow-none rounded-lg hover:opacity-75 transition dark:bg-neutral-700">
                   <CardContent className="p-4 flex items-center gap-x-2.5">
                     <ProjectAvatar
                       name={project.name}
@@ -226,10 +226,10 @@ export const MembersList = ({ data, total, isAdmin }: MembersListProps) => {
 
   return (
     <div className="flex flex-col gap-y-4 col-span-1">
-      <div className="bg-white border rounded-lg p-4">
+      <div className="bg-white border rounded-lg p-4 dark:bg-neutral-800">
         <div className="flex items-center justify-between">
           <p className="text-lg font-semibold">Members ({total})</p>
-          <Button variant="secondary" asChild>
+          <Button asChild>
             <Link href={`/workspaces/${workspaceId}/members`}>
               <SettingsIcon className="size-4 text-neutral-400" />
             </Link>
@@ -239,7 +239,7 @@ export const MembersList = ({ data, total, isAdmin }: MembersListProps) => {
         <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {data.map((member) => (
             <li key={member.$id}>
-              <Card className="shadow-none rounded-lg overflow-hidden">
+              <Card className="shadow-none rounded-lg overflow-hidden dark:bg-neutral-700">
                 <CardContent className="p-3 flex flex-col items-center gap-x-2">
                   <MemberAvatar name={member.name} className="size-12" />
                   <div className="flex flex-col items-center overflow-hidden">

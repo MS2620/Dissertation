@@ -16,16 +16,21 @@ interface TaskOverviewProps {
 export const TaskOverview = ({ task }: TaskOverviewProps) => {
   const { open } = useEditTaskModal();
   return (
-    <div className="flex flex-col gap-y-4 col-span-1">
-      <div className="bg-muted rounded-lg p-4">
+    <div className="flex flex-col gap-y-4 col-span-1 dark:bg-neutral-800">
+      <div className="bg-muted rounded-lg p-4 ">
         <div className="flex items-center justify-between">
           <p className="text-lg font-semibold">Overview</p>
-          <Button onClick={() => open(task.$id)} size="sm" variant="secondary">
+          <Button
+            onClick={() => open(task.$id)}
+            size="sm"
+            variant="outline"
+            className="dark:hover:bg-neutral-900"
+          >
             <PencilIcon className="size-4 mr-2" />
             Edit
           </Button>
         </div>
-        <Separator className="my-4" />
+        <Separator className="my-4 dark:bg-neutral-700" />
         <div className="flex flex-col gap-y-4">
           <OverviewProperty label="Assignee">
             <MemberAvatar name={task.assignee.name} className="size-6" />

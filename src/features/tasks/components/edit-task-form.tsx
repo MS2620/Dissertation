@@ -73,12 +73,12 @@ export const EditTaskForm = ({
   };
 
   return (
-    <Card className="w-full h-full border-none shadow-none">
+    <Card className="w-full h-full border-none shadow-none dark:bg-neutral-800">
       <CardHeader className="flex p-7">
         <CardTitle className="text-xl font-bold">Edit a task</CardTitle>
       </CardHeader>
       <div className="px-7">
-        <Separator />
+        <Separator className="dark:bg-neutral-700" />
       </div>
       <CardContent className="p-7">
         <Form {...form}>
@@ -94,6 +94,7 @@ export const EditTaskForm = ({
                       <Input
                         {...field}
                         placeholder="Enter a task name for your project"
+                        className="dark:bg-neutral-700"
                       />
                     </FormControl>
                     <FormMessage />
@@ -124,12 +125,12 @@ export const EditTaskForm = ({
                       onValueChange={field.onChange}
                     >
                       <FormControl>
-                        <SelectTrigger>
+                        <SelectTrigger className="dark:bg-neutral-700">
                           <SelectValue placeholder="Select an assignee" />
                         </SelectTrigger>
                       </FormControl>
                       <FormMessage />
-                      <SelectContent>
+                      <SelectContent className="dark:bg-neutral-700">
                         {memberOptions.map((member) => (
                           <SelectItem key={member.$id} value={member.$id}>
                             <div className="flex items-center gap-x-2">
@@ -157,12 +158,12 @@ export const EditTaskForm = ({
                       onValueChange={field.onChange}
                     >
                       <FormControl>
-                        <SelectTrigger>
+                        <SelectTrigger className="dark:bg-neutral-700">
                           <SelectValue placeholder="Select status" />
                         </SelectTrigger>
                       </FormControl>
                       <FormMessage />
-                      <SelectContent>
+                      <SelectContent className="dark:bg-neutral-700">
                         <SelectItem value={TaskStatus.BACKLOG}>
                           Backlog
                         </SelectItem>
@@ -182,15 +183,18 @@ export const EditTaskForm = ({
                 )}
               />
             </div>
-            <Separator className="my-7" />
+            <Separator className="my-7 dark:bg-neutral-700" />
             <div className="flex items-center justify-between">
               <Button
                 type="button"
                 size="lg"
-                variant="secondary"
+                variant="outline"
                 onClick={onCancel}
                 disabled={isPending}
-                className={cn(!onCancel && "invisible")}
+                className={cn([
+                  !onCancel && "invisible",
+                  "dark:hover:bg-neutral-900",
+                ])}
               >
                 Cancel
               </Button>

@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { useWorkspaceId } from "../hooks/use-workspace-id";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ArrowLeftIcon, MoreVerticalIcon } from "lucide-react";
+import { ArrowLeftIcon, MoreVerticalIcon, TrashIcon } from "lucide-react";
 import Link from "next/link";
 import { Separator } from "@/components/ui/separator";
 import { useGetMembers } from "@/features/members/api/use-get-members";
@@ -58,18 +58,25 @@ export const MembersList = () => {
   };
 
   return (
-    <Card className="w-full h-full border-none shadow-none">
+    <Card className="w-full h-full border-none shadow-none dark:bg-neutral-800">
       <ConfirmDialog />
       <CardHeader className="flex flex-row items-center gap-x-4 p-7 space-y-0">
-        <Button asChild variant="secondary" size="sm">
+        <Button
+          asChild
+          variant="outline"
+          size="sm"
+          className="dark:hover:bg-neutral-900"
+        >
           <Link href={`/workspaces/${workspaceId}`}>
             <ArrowLeftIcon className="size-4" /> Back
           </Link>
         </Button>
-        <CardTitle className="text-xl font-bold">Members List</CardTitle>
+        <CardTitle className="text-xl font-bold">
+          Workspace Members List
+        </CardTitle>
       </CardHeader>
       <div className="px-7">
-        <Separator />
+        <Separator className="dark:bg-neutral-700" />
       </div>
       <CardContent className="p-7">
         {data?.documents.map((member, index) => (
@@ -85,12 +92,19 @@ export const MembersList = () => {
                 <p className="text-xs text-muted-foreground">{member.email}</p>
               </div>
               <DropdownMenu>
-                <DropdownMenuTrigger asChild>
+                <DropdownMenuTrigger
+                  asChild
+                  className="dark:bg-neutral-700 dark:hover:bg-neutral-900"
+                >
                   <Button className="ml-auto" variant="secondary" size="icon">
                     <MoreVerticalIcon className="size-4 text-muted-foreground" />
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent side="bottom" align="end">
+                <DropdownMenuContent
+                  side="bottom"
+                  align="end"
+                  className="dark:bg-neutral-700"
+                >
                   <DropdownMenuItem
                     className="font-medium"
                     onClick={() =>
@@ -114,6 +128,7 @@ export const MembersList = () => {
                     onClick={() => handleDeleteMember(member.$id)}
                     disabled={isDeletingMember}
                   >
+                    <TrashIcon className="size-4" />
                     Remove {member.name}
                   </DropdownMenuItem>
                 </DropdownMenuContent>

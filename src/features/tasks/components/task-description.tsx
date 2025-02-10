@@ -29,13 +29,14 @@ export const TaskDescription = ({ task }: TaskDescriptionProps) => {
     );
   };
   return (
-    <div className="border rounded-lg p-4">
+    <div className="border rounded-lg p-4 dark:bg-neutral-800">
       <div className="flex items-center justify-between">
         <p className="text-lg font-semibold">Description</p>
         <Button
           onClick={() => setIsEditing((prev) => !prev)}
           size="sm"
-          variant="secondary"
+          variant="outline"
+          className="dark:hover:bg-neutral-900"
         >
           {isEditing ? (
             <XIcon className="size-4 mr-2" />
@@ -45,7 +46,7 @@ export const TaskDescription = ({ task }: TaskDescriptionProps) => {
           {isEditing ? "Cancel" : "Edit"}
         </Button>
       </div>
-      <Separator className="my-4" />
+      <Separator className="my-4 dark:bg-neutral-700" />
       {isEditing ? (
         <div className="flex flex-col gap-y-4">
           <Textarea
@@ -54,6 +55,7 @@ export const TaskDescription = ({ task }: TaskDescriptionProps) => {
             rows={4}
             onChange={(e) => setValue(e.target.value)}
             disabled={isPending}
+            className="dark:bg-neutral-700"
           />
           <Button
             size="sm"

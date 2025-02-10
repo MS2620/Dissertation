@@ -40,7 +40,7 @@ export const useConfirm = (
 
   const ConfirmationDialog = () => (
     <ResponsiveModal open={promise !== null} onOpenChange={handleClose}>
-      <Card className="w-full h-full border-none shadow-none">
+      <Card className="w-full h-full border-none shadow-none dark:bg-neutral-800">
         <CardContent className="pt-8">
           <CardHeader className="p-0">
             <CardTitle>{title}</CardTitle>
@@ -50,7 +50,7 @@ export const useConfirm = (
             <Button
               onClick={handleCancel}
               variant="outline"
-              className="w-full lg:w-auto"
+              className="w-full lg:w-auto dark:hover:bg-neutral-900"
             >
               Cancel
             </Button>

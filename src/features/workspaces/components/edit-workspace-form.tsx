@@ -20,7 +20,6 @@ import { ArrowLeftIcon, CopyIcon, ImageIcon, Loader } from "lucide-react";
 import Image from "next/image";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { useRouter } from "next/navigation";
-import { cn } from "@/lib/utils";
 import { Workspace } from "../types";
 import { useUpdateWorkspace } from "../api/use-update-workspace";
 import { useConfirm } from "@/hooks/use-confirm";
@@ -117,14 +116,15 @@ export const EditWorkspaceForm = ({
   };
 
   return (
-    <div className="flex flex-col gap-y-4">
+    <div className="flex flex-col gap-y-4 dark:">
       <DeleteDialog />
       <ResetDialog />
-      <Card className="w-full h-full border-none shadow-none">
+      <Card className="w-full h-full border-none shadow-none dark:bg-neutral-800">
         <CardHeader className="flex flex-row items-center gap-x-4 p-7 space-y-0">
           <Button
             size="sm"
-            variant="secondary"
+            variant="outline"
+            className="dark:hover:bg-neutral-900"
             onClick={
               onCancel
                 ? onCancel
@@ -139,7 +139,7 @@ export const EditWorkspaceForm = ({
           </CardTitle>
         </CardHeader>
         <div className="px-7">
-          <Separator />
+          <Separator className="dark:bg-neutral-700" />
         </div>
         <CardContent className="p-7">
           <Form {...form}>
@@ -155,6 +155,7 @@ export const EditWorkspaceForm = ({
                         <Input
                           {...field}
                           placeholder="Enter a name for your workspace"
+                          className="dark:bg-neutral-700"
                         />
                       </FormControl>
                       <FormMessage />
@@ -232,18 +233,9 @@ export const EditWorkspaceForm = ({
                   )}
                 />
               </div>
-              <Separator className="my-7" />
+              <Separator className="my-7 dark:bg-neutral-700" />
               <div className="flex items-center justify-between">
-                <Button
-                  type="button"
-                  size="lg"
-                  variant="secondary"
-                  onClick={onCancel}
-                  disabled={isPending}
-                  className={cn(!onCancel && "invisible")}
-                >
-                  Cancel
-                </Button>
+                <div></div>
                 <Button size="lg">
                   {isPending ? (
                     <>
@@ -259,7 +251,7 @@ export const EditWorkspaceForm = ({
         </CardContent>
       </Card>
 
-      <Card className="w-full h-full border-none shadow-none">
+      <Card className="w-full h-full border-none shadow-none dark:bg-neutral-800">
         <CardContent className="p-7">
           <div className="flex flex-col">
             <h3 className="font-bold">Invite Members</h3>
@@ -268,17 +260,21 @@ export const EditWorkspaceForm = ({
             </p>
             <div className="mt-4">
               <div className="flex items-center gap-x-2">
-                <Input value={fullInvitelink} disabled />
+                <Input
+                  value={fullInvitelink}
+                  disabled
+                  className="dark:bg-neutral-700"
+                />
                 <Button
-                  className="size-9"
-                  variant="secondary"
+                  className="size-9 dark:hover:bg-neutral-900"
+                  variant="outline"
                   onClick={handleCopyInviteLink}
                 >
                   <CopyIcon className="size-5" />
                 </Button>
               </div>
             </div>
-            <Separator className="my-4" />
+            <Separator className="my-4 dark:bg-neutral-700" />
             <Button
               className="w-fit ml-auto"
               size="sm"
@@ -293,7 +289,7 @@ export const EditWorkspaceForm = ({
         </CardContent>
       </Card>
 
-      <Card className="w-full h-full border-none shadow-none">
+      <Card className="w-full h-full border-none shadow-none dark:bg-neutral-800">
         <CardContent className="p-7">
           <div className="flex flex-col">
             <h3 className="font-bold">Danger Zone</h3>
@@ -301,7 +297,7 @@ export const EditWorkspaceForm = ({
               Deleting a workspace is irreversible and will remove all
               associated data.
             </p>
-            <Separator className="my-4" />
+            <Separator className="my-4 dark:bg-neutral-700" />
             <Button
               className="w-fit ml-auto"
               size="sm"
