@@ -38,7 +38,7 @@ const getRoutes = (isAdmin: boolean) => [
     adminOnly: true,
   },
   {
-    label: "Members",
+    label: "Workspace Members",
     href: "/members",
     icon: UsersIcon,
     activeIcon: UsersIcon,
