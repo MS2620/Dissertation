@@ -37,7 +37,7 @@ export const UserButton = () => {
   return (
     <DropdownMenu modal={false}>
       <DropdownMenuTrigger className="outline-none relative">
-        <Avatar className="size-10 hover:opactiy-75 transition border border-neutral-300 ">
+        <Avatar className="size-10 hover:opactiy-75 transition border border-neutral-300 dark:border-none ">
           <AvatarFallback className="bg-neutral-200 font-medium text-neutral-500 flex items-center justify-center">
             {avatarFallback}
           </AvatarFallback>
@@ -46,7 +46,7 @@ export const UserButton = () => {
       <DropdownMenuContent
         align="end"
         side="bottom"
-        className="w-60"
+        className="w-60 dark:bg-neutral-700 dark:border-none"
         sideOffset={10}
       >
         <div className="flex flex-col items-center justify-center gap-2 px-2.5 py-4">
@@ -56,16 +56,16 @@ export const UserButton = () => {
             </AvatarFallback>
           </Avatar>
           <div className="flex flex-col items-center justify-center">
-            <p className="text-sm font-medium text-neutral-900">
+            <p className="text-sm font-medium text-neutral-900 dark:text-neutral-100">
               {name || "User"}
             </p>
             <p className="text-xs text-neutral-500">{email}</p>
           </div>
         </div>
-        <Separator className="mb-1" />
+        <Separator className="mb-1 dark:bg-neutral-600" />
         <DropdownMenuItem
           onClick={() => logout()}
-          className="h-10 flex items-center justify-center text-amber-700 font-medium cursor-pointer"
+          className="h-10 flex items-center justify-center text-amber-700 font-medium cursor-pointer dark:hover:bg-amber-700 dark:hover:text-black"
         >
           <LogOut className="size-4 mr-2" />
           Logout

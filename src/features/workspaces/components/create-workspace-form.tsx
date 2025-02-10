@@ -64,14 +64,14 @@ export const CreateWorkspaceForm = ({ onCancel }: CreateWorkspaceFormProps) => {
   };
 
   return (
-    <Card className="w-full h-full border-none shadow-none">
+    <Card className="w-full h-full border-none shadow-none dark:bg-neutral-800">
       <CardHeader className="flex p-7">
         <CardTitle className="text-xl font-bold">
           Create a new workspace
         </CardTitle>
       </CardHeader>
       <div className="px-7">
-        <Separator />
+        <Separator className=" dark:bg-neutral-700" />
       </div>
       <CardContent className="p-7">
         <Form {...form}>
@@ -87,6 +87,7 @@ export const CreateWorkspaceForm = ({ onCancel }: CreateWorkspaceFormProps) => {
                       <Input
                         {...field}
                         placeholder="Enter a name for your workspace"
+                        className="dark:bg-neutral-700"
                       />
                     </FormControl>
                     <FormMessage />
@@ -164,15 +165,18 @@ export const CreateWorkspaceForm = ({ onCancel }: CreateWorkspaceFormProps) => {
                 )}
               />
             </div>
-            <Separator className="my-7" />
+            <Separator className="my-7 dark:bg-neutral-700" />
             <div className="flex items-center justify-between">
               <Button
                 type="button"
                 size="lg"
-                variant="secondary"
+                variant="outline"
                 onClick={onCancel}
                 disabled={isPending}
-                className={cn(!onCancel && "invisible")}
+                className={cn([
+                  !onCancel && "invisible",
+                  "dark:hover:bg-neutral-900",
+                ])}
               >
                 Cancel
               </Button>

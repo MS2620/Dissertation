@@ -21,11 +21,11 @@ import {
   ImageIcon,
   Loader,
   MoreVerticalIcon,
+  TrashIcon,
 } from "lucide-react";
 import Image from "next/image";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { useRouter } from "next/navigation";
-import { cn } from "@/lib/utils";
 import { Project } from "../types";
 import { useUpdateProject } from "../api/use-update-project";
 import { useDeleteProject } from "../api/use-delete-project";
@@ -175,11 +175,12 @@ export const EditProjectForm = ({
   return (
     <div className="flex flex-col gap-y-4">
       <DeleteDialog />
-      <Card className="w-full h-full border-none shadow-none">
+      <Card className="w-full h-full border-none shadow-none dark:bg-neutral-800">
         <CardHeader className="flex flex-row items-center gap-x-4 p-7 space-y-0">
           <Button
             size="sm"
-            variant="secondary"
+            variant="outline"
+            className="dark:hover:bg-neutral-900"
             onClick={
               onCancel
                 ? onCancel
@@ -197,7 +198,7 @@ export const EditProjectForm = ({
           </CardTitle>
         </CardHeader>
         <div className="px-7">
-          <Separator />
+          <Separator className="dark:bg-neutral-700" />
         </div>
         <CardContent className="p-7">
           <Form {...form}>
@@ -213,6 +214,7 @@ export const EditProjectForm = ({
                         <Input
                           {...field}
                           placeholder="Enter a name for your project"
+                          className="dark:bg-neutral-700"
                         />
                       </FormControl>
                       <FormMessage />
@@ -290,18 +292,9 @@ export const EditProjectForm = ({
                   )}
                 />
               </div>
-              <Separator className="my-7" />
+              <Separator className="my-7 dark:bg-neutral-700" />
               <div className="flex items-center justify-between">
-                <Button
-                  type="button"
-                  size="lg"
-                  variant="secondary"
-                  onClick={onCancel}
-                  disabled={isPending}
-                  className={cn(!onCancel && "invisible")}
-                >
-                  Cancel
-                </Button>
+                <div></div>
                 <Button size="lg">
                   {isPending ? (
                     <>
@@ -318,7 +311,7 @@ export const EditProjectForm = ({
       </Card>
 
       {members && (
-        <Card>
+        <Card className="w-full h-full border-none shadow-none dark:bg-neutral-800">
           <ConfirmDialog />
           <CardHeader className="flex flex-row items-center gap-x-4 p-7 space-y-0">
             <CardTitle className="text-xl font-bold">
@@ -326,7 +319,7 @@ export const EditProjectForm = ({
             </CardTitle>
           </CardHeader>
           <div className="px-7">
-            <Separator />
+            <Separator className="dark:bg-neutral-700" />
           </div>
           <CardContent className="p-7">
             {members?.map((member, index) => (
@@ -346,26 +339,31 @@ export const EditProjectForm = ({
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                       <Button
-                        className="ml-auto"
-                        variant="secondary"
+                        className="ml-auto dark:hover:bg-neutral-900"
+                        variant="outline"
                         size="icon"
                       >
                         <MoreVerticalIcon className="size-4 text-muted-foreground" />
                       </Button>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent side="bottom" align="end">
+                    <DropdownMenuContent
+                      side="bottom"
+                      align="end"
+                      className="dark:bg-neutral-700"
+                    >
                       <DropdownMenuItem
                         className="font-medium text-amber-700"
                         onClick={() => handleDeleteMember(member.$id)}
                         disabled={isDeletingMember}
                       >
+                        <TrashIcon />
                         Remove {member.name}
                       </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
                 </div>
                 {index !== members.length - 1 && (
-                  <Separator className="my-2.5" />
+                  <Separator className="my-2.5 dark:bg-neutral-700" />
                 )}
               </Fragment>
             ))}
@@ -374,52 +372,59 @@ export const EditProjectForm = ({
       )}
 
       {nonProjectMembers && (
-        <Card className="w-full h-full border-none shadow-none">
-          <CardContent>
-            <div className="flex flex-col gap-y-4 p-7">
-              <h3 className="font-bold">Project Members</h3>
-              <p className="text-sm text-muted-foreground">
-                Add members to this project.
-              </p>
-              <Separator className="my-2" />
-              <Form {...form}>
-                <form
-                  onSubmit={nonProjectMembersform.handleSubmit(
-                    onAddMemberSubmit
-                  )}
-                >
-                  <Select onValueChange={(value) => onMemberChange(value)}>
-                    <SelectTrigger className="w-full lg:w-auto h-10">
-                      <SelectValue placeholder="All non project members" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {nonProjectMembers?.documents.map((member) => (
-                        <SelectItem key={member.$id} value={member.$id}>
-                          <div className="flex flex-row items-center gap-x-2">
-                            <MemberAvatar
-                              className="size-8"
-                              fallbackClassName="text-lg"
-                              name={member.name}
-                            />
-                            {member.name}
-                          </div>
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <div className="flex justify-end">
-                    <Button className="mt-4" type="submit">
-                      Add Member
-                    </Button>
-                  </div>
-                </form>
-              </Form>
-            </div>
+        <Card className="w-full h-full border-none shadow-none dark:bg-neutral-800">
+          <CardHeader className="flex flex-row items-center gap-x-4 p-7 space-y-0">
+            <CardTitle className="text-xl font-bold">
+              Add Workspace Member To Project
+            </CardTitle>
+          </CardHeader>
+          <div className="px-7">
+            <Separator className="dark:bg-neutral-700" />
+          </div>
+          <CardContent className="p-7">
+            <Form {...form}>
+              <form
+                onSubmit={nonProjectMembersform.handleSubmit(onAddMemberSubmit)}
+              >
+                <Select onValueChange={(value) => onMemberChange(value)}>
+                  <SelectTrigger className="w-full lg:w-auto h-10 dark:bg-neutral-700">
+                    <SelectValue placeholder="All non project members" />
+                  </SelectTrigger>
+                  <SelectContent className="w-full lg:w-auto dark:bg-neutral-700">
+                    {nonProjectMembers?.documents.map((member) => (
+                      <SelectItem key={member.$id} value={member.$id}>
+                        <div className="flex flex-row items-center gap-x-2">
+                          <MemberAvatar
+                            className="size-8"
+                            fallbackClassName="text-lg"
+                            name={member.name}
+                          />
+                          {member.name}
+                        </div>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <Separator className="my-7 dark:bg-neutral-700" />
+                <div className="flex items-center justify-between">
+                  <div></div>
+                  <Button size="lg">
+                    {isPending ? (
+                      <>
+                        <Loader className="animate-spin size-10" /> Loading
+                      </>
+                    ) : (
+                      "Save Changes"
+                    )}
+                  </Button>
+                </div>
+              </form>
+            </Form>
           </CardContent>
         </Card>
       )}
 
-      <Card className="w-full h-full border-none shadow-none">
+      <Card className="w-full h-full border-none shadow-none dark:bg-neutral-800">
         <CardContent className="p-7">
           <div className="flex flex-col">
             <h3 className="font-bold">Danger Zone</h3>
@@ -427,7 +432,7 @@ export const EditProjectForm = ({
               Deleting a project is irreversible and will remove all associated
               data.
             </p>
-            <Separator className="my-4" />
+            <Separator className="my-4 dark:bg-neutral-700" />
             <Button
               className="w-fit ml-auto"
               size="sm"

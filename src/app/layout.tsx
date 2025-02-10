@@ -6,6 +6,7 @@ import Providers from "@/components/query-provider";
 import { Toaster } from "@/components/ui/sonner";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
 import { SpeedInsights } from "@vercel/speed-insights/next";
+import { ThemeProvider } from "@/components/theme-provider";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -26,7 +27,14 @@ export default function RootLayout({
           <Toaster />
           <NuqsAdapter>
             <SpeedInsights />
-            {children}
+            <ThemeProvider
+              attribute="class"
+              defaultTheme="system"
+              enableSystem
+              disableTransitionOnChange
+            >
+              {children}
+            </ThemeProvider>
           </NuqsAdapter>
         </Providers>
       </body>

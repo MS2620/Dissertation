@@ -72,7 +72,7 @@ export const TaskViewSwitcher = ({
       onValueChange={setView}
       className="flex-1 w-full border rounded-lg"
     >
-      <div className="h-full flex flex-col overflow-auto p-4">
+      <div className="h-full flex flex-col overflow-auto p-4 dark:bg-neutral-800 rounded-md">
         <div className="flex flex-col gap-y-2 lg:flex-row justify-between items-center">
           <TabsList className="w-full lg:w-auto">
             <TabsTrigger className="h-8 w-full lg:w-auto" value="table">
@@ -92,11 +92,11 @@ export const TaskViewSwitcher = ({
             </Button>
           )}
         </div>
-        <Separator className="my-4" />
+        <Separator className="my-4 dark:bg-neutral-700" />
         {isAdmin && (
           <>
             <DataFilters hideProjectFilter={hideProjectFilter} />
-            <Separator className="my-4" />
+            <Separator className="my-4 dark:bg-neutral-700" />
           </>
         )}
         {isLoadingTasks ? (

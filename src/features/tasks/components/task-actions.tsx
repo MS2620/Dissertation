@@ -48,17 +48,17 @@ export const TaskActions = ({ $id, children }: TaskActionsProps) => {
       <ConfirmDialog />
       <DropdownMenu modal={false}>
         <DropdownMenuTrigger asChild>{children}</DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className="w-48">
+        <DropdownMenuContent align="end" className="w-48 dark:bg-neutral-700 ">
           <DropdownMenuItem
             onClick={onOpenTask}
-            className="font-medium p-[10px]"
+            className="font-medium p-[10px] dark:hover:bg-neutral-800"
           >
             <ExternalLinkIcon className="size-4 mr-2 stroke-2" />
             Task Details
           </DropdownMenuItem>
           <DropdownMenuItem
             onClick={() => open($id)}
-            className="font-medium p-[10px]"
+            className="font-medium p-[10px] dark:hover:bg-neutral-800"
           >
             <PencilIcon className="size-4 mr-2 stroke-2" />
             Edit Task
@@ -66,7 +66,7 @@ export const TaskActions = ({ $id, children }: TaskActionsProps) => {
           <DropdownMenuItem
             onClick={onDelete}
             disabled={isPending}
-            className="text-amber-700 focus:text-amber-700 font-medium p-[10px]"
+            className="text-amber-700 focus:text-amber-700 font-medium p-[10px] dark:hover:bg-neutral-800"
           >
             <TrashIcon className="size-4 mr-2 stroke-2" />
             Delete Task

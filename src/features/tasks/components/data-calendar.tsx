@@ -45,18 +45,20 @@ const CustomToolbar = ({ date, onNavigate }: CustomToolbarProps) => {
     <div className="flex mb-4 gap-x-2 items-center w-full lg:w-auto justify-center lg:justify-start">
       <Button
         onClick={() => onNavigate("PREV")}
-        variant="secondary"
+        variant="outline"
+        className="dark:hover:bg-neutral-900"
         size="icon"
       >
         <ChevronLeftIcon className="size-4" />
       </Button>
-      <div className="flex items-center border border-input rounded-md px-3 py-2 h-8 justify-center w-full lg:w-auto">
+      <div className="flex items-center border border-input rounded-md px-3 py-2 h-8 justify-center w-full lg:w-auto dark:bg-neutral-700">
         <CalendarIcon className="size-4 mr-2" />
         <p className="text-sm">{format(date, "MMMM yyyy")}</p>
       </div>
       <Button
         onClick={() => onNavigate("NEXT")}
-        variant="secondary"
+        variant="outline"
+        className="dark:hover:bg-neutral-900"
         size="icon"
       >
         <ChevronRightIcon className="size-4" />
@@ -99,7 +101,7 @@ export const DataCalendar = ({ data }: DataCalendarProps) => {
       defaultView="month"
       toolbar
       showAllEvents
-      className="h-full"
+      className="h-full "
       max={new Date(new Date().setFullYear(new Date().getFullYear() + 1))}
       formats={{
         weekdayFormat: (date, culture, localizer) =>

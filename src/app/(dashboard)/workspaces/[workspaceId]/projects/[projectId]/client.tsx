@@ -41,7 +41,12 @@ export const ProjectIdClient = () => {
           <p className="text-lg font-semibold">{project.name}</p>
         </div>
         <div>
-          <Button variant="outline" size="sm" asChild>
+          <Button
+            variant="outline"
+            size="sm"
+            asChild
+            className="dark:bg-white dark:text-black p-3 dark:border-none dark:hover:bg-neutral-200"
+          >
             <Link
               href={`/workspaces/${project.workspaceId}/projects/${projectId}/settings`}
             >

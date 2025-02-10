@@ -42,7 +42,7 @@ export const DatePicker = ({
           {value ? format(value, "dd/MM/yyyy") : <span>{placeholder}</span>}
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-auto p-0">
+      <PopoverContent className="w-auto p-0 dark:bg-neutral-700">
         <Calendar
           mode="single"
           selected={value}

@@ -73,11 +73,12 @@ export const Navigation = () => {
           <Link key={item.href} href={fullHref}>
             <div
               className={cn(
-                "flex items-center gap-2.5 p-2.5 rounded-md font-medium hover:text-primary transition text-neutral-500",
-                isActive && "bg-white shadow-sm hover:opacity-100 text-primary"
+                "flex items-center gap-2.5 p-2.5 rounded-md font-medium hover:text-primary transition text-neutral-500 ",
+                isActive &&
+                  "bg-white dark:bg-neutral-700 shadow-sm hover:opacity-100 text-primary dark:text-white"
               )}
             >
-              <Icon className="size-5 text-neutral-500" />
+              <Icon className="size-5 text-neutral-500 dark:text-neutral-400" />
               <span>{item.label}</span>
             </div>
           </Link>
