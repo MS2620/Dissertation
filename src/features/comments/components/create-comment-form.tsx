@@ -1,11 +1,8 @@
-"use client";
+import React, { useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
-import { Loader } from "lucide-react";
+import { Loader, Code as CodeIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
-
-import { createCommentSchema } from "../schemas";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -16,27 +13,54 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
-import { useCreateComment } from "../api/use-create-comment";
 import { Textarea } from "@/components/ui/textarea";
-import { useRef, useState } from "react";
-import { useTaskId } from "@/features/tasks/hooks/use-task-id";
-import { useCurrent } from "@/features/auth/api/use-current";
-import { useWorkspaceId } from "@/features/workspaces/hooks/use-workspace-id";
 import { Input } from "@/components/ui/input";
+import { useCreateComment } from "../api/use-create-comment";
+import { useTaskId } from "@/features/tasks/hooks/use-task-id";
+import { useWorkspaceId } from "@/features/workspaces/hooks/use-workspace-id";
+import { useCurrent } from "@/features/auth/api/use-current";
+import { createCommentSchema } from "../schemas";
+import { z } from "zod";
 
-interface CreateCommentFormProps {
-  onCancel?: () => void;
-}
+const CommentPreview = ({ content }: { content: string }) => {
+  // Split content by code block markers
+  const parts = content.split("```");
 
-export const CreateCommentForm = ({ onCancel }: CreateCommentFormProps) => {
+  return (
+    <div className="mt-4 p-4 rounded-md bg-neutral-100 dark:bg-neutral-900">
+      {parts.map((part, index) => {
+        // Even indices are regular text, odd indices are code blocks
+        if (index % 2 === 0) {
+          return (
+            <p key={index} className="whitespace-pre-wrap">
+              {part}
+            </p>
+          );
+        } else {
+          return (
+            <pre
+              key={index}
+              className="my-2 p-4 rounded bg-neutral-200 dark:bg-neutral-800 font-mono"
+            >
+              <code>{part}</code>
+            </pre>
+          );
+        }
+      })}
+    </div>
+  );
+};
+
+export const CreateCommentForm = ({ onCancel }: { onCancel?: () => void }) => {
   const taskId = useTaskId();
   const workspaceId = useWorkspaceId();
   const { data: user } = useCurrent();
   const inputRef = useRef<HTMLInputElement>(null);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [showPreview, setShowPreview] = useState(false);
 
   const { mutate, isPending } = useCreateComment();
 
@@ -66,18 +90,13 @@ export const CreateCommentForm = ({ onCancel }: CreateCommentFormProps) => {
       formData.append("document", selectedFile);
     }
 
-    // Log FormData contents for debugging
-    console.log("FormData contents before submission:");
-    for (const [key, value] of formData.entries()) {
-      console.log(`${key}:`, value instanceof File ? value.name : value);
-    }
-
     mutate(
       { formData },
       {
         onSuccess: () => {
           form.reset();
           setSelectedFile(null);
+          setShowPreview(false);
           if (inputRef.current) {
             inputRef.current.value = "";
           }
@@ -85,6 +104,25 @@ export const CreateCommentForm = ({ onCancel }: CreateCommentFormProps) => {
         },
       }
     );
+  };
+
+  const insertCodeBlock = () => {
+    const textarea = textareaRef.current;
+    if (!textarea) return;
+
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const text = form.getValues("comment");
+
+    const selectedText = text.substring(start, end);
+    const newText =
+      text.substring(0, start) +
+      "\n```\n" +
+      selectedText +
+      "\n```\n" +
+      text.substring(end);
+
+    form.setValue("comment", newText);
   };
 
   const handleDocumentChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -116,17 +154,43 @@ export const CreateCommentForm = ({ onCancel }: CreateCommentFormProps) => {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Comment</FormLabel>
+                    <div className="flex gap-2 mb-2">
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={insertCodeBlock}
+                        className="flex items-center gap-2"
+                      >
+                        <CodeIcon className="size-4" />
+                        Insert Code Block
+                      </Button>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setShowPreview(!showPreview)}
+                      >
+                        {showPreview ? "Hide Preview" : "Show Preview"}
+                      </Button>
+                    </div>
                     <FormControl>
                       <Textarea
                         {...field}
-                        placeholder="Enter your comment"
-                        className="dark:bg-neutral-700"
+                        ref={textareaRef}
+                        placeholder="Enter your comment. Use the Code Block button to format code snippets."
+                        className="dark:bg-neutral-700 font-mono min-h-32"
+                        disabled={isPending}
                       />
                     </FormControl>
+                    {showPreview && field.value && (
+                      <CommentPreview content={field.value} />
+                    )}
                     <FormMessage />
                   </FormItem>
                 )}
               />
+
               <FormField
                 control={form.control}
                 name="document"
@@ -156,7 +220,9 @@ export const CreateCommentForm = ({ onCancel }: CreateCommentFormProps) => {
                 )}
               />
             </div>
+
             <Separator className="my-7 dark:bg-neutral-700" />
+
             <div className="flex items-center justify-between">
               <Button
                 type="button"
@@ -174,7 +240,7 @@ export const CreateCommentForm = ({ onCancel }: CreateCommentFormProps) => {
               <Button size="lg" type="submit" disabled={isPending}>
                 {isPending ? (
                   <>
-                    <Loader className="animate-spin size-10" /> Loading
+                    <Loader className="animate-spin size-4 mr-2" /> Loading
                   </>
                 ) : (
                   "Create Comment"
@@ -187,3 +253,5 @@ export const CreateCommentForm = ({ onCancel }: CreateCommentFormProps) => {
     </Card>
   );
 };
+
+export default CreateCommentForm;

@@ -27,11 +27,11 @@ export const useCreateComment = () => {
       return await response.json();
     },
     onSuccess: () => {
-      toast.success("✅ Comment created successfully");
-      queryClient.invalidateQueries({ queryKey: ["comment"] });
+      toast.success("Comment created successfully");
+      queryClient.invalidateQueries({ queryKey: ["comments"] });
     },
     onError: (error) => {
-      console.error("❌ Error in useCreateComment:", error);
+      console.error("Error in useCreateComment:", error);
       toast.error(error.message || "Failed to create comment");
     },
   });

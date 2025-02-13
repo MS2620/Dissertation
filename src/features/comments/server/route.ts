@@ -3,12 +3,19 @@ import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
 import { createCommentSchema } from "../schemas";
 import { getMember } from "@/features/members/utils";
-import { COMMENTS_ID, DATABASE_ID, DOCUMENTS_ID, MEMBERS_ID } from "@/config";
+import {
+  COMMENTS_ID,
+  DATABASE_ID,
+  DOCUMENTS_ID,
+  MEMBERS_ID,
+  TASKS_ID,
+} from "@/config";
 import { ID, Query } from "node-appwrite";
 import { z } from "zod";
 import { createAdminClient } from "@/lib/appwrite";
 
 import { Comment } from "../types";
+import { MemberRole } from "@/features/members/types";
 
 // Base types
 interface BaseComment {
@@ -65,17 +72,31 @@ const app = new Hono()
       commentId
     );
 
+    const taskComment = comment?.taskId;
+
+    const task = await databases.getDocument(
+      DATABASE_ID,
+      TASKS_ID,
+      taskComment
+    );
+
+    const member = await getMember({
+      databases,
+      workspaceId: task.workspaceId,
+      userId: user.$id,
+    });
+
     if (!comment) {
       return c.json({ error: "Task not found" }, 404);
     }
 
-    if (user.$id !== comment.creator) {
+    if (member.role !== MemberRole.ADMIN || member.$id !== comment.creator) {
       return c.json({ error: "Unauthorized" }, 401);
     }
 
     await databases.deleteDocument(DATABASE_ID, COMMENTS_ID, commentId);
 
-    return c.json({ success: true });
+    return c.json({ data: { $id: comment.$id } });
   })
 
   .get(

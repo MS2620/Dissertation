@@ -5,11 +5,11 @@ import { toast } from "sonner";
 import { client } from "@/lib/rpc";
 
 type ResponseType = InferResponseType<
-  (typeof client.api.tasks)[":taskId"]["$delete"],
+  (typeof client.api.comments)[":commentId"]["$delete"],
   200
 >;
 type RequestType = InferRequestType<
-  (typeof client.api.tasks)[":taskId"]["$delete"]
+  (typeof client.api.comments)[":commentId"]["$delete"]
 >;
 
 export const useDeleteComment = () => {
@@ -17,21 +17,23 @@ export const useDeleteComment = () => {
 
   const mutation = useMutation<ResponseType, Error, RequestType>({
     mutationFn: async ({ param }) => {
-      const response = await client.api.tasks[":taskId"]["$delete"]({ param });
+      const response = await client.api.comments[":commentId"]["$delete"]({
+        param,
+      });
 
       if (!response.ok) {
-        throw new Error("Failed to delete task");
+        throw new Error("Failed to delete comment");
       }
 
       return await response.json();
     },
     onSuccess: ({ data }) => {
-      toast.success("Task deleted successfully");
-      queryClient.invalidateQueries({ queryKey: ["tasks"] });
-      queryClient.invalidateQueries({ queryKey: ["task", data.$id] });
+      toast.success("Comment deleted successfully");
+      queryClient.invalidateQueries({ queryKey: ["comments"] });
+      queryClient.invalidateQueries({ queryKey: ["comment", data.$id] });
     },
     onError: () => {
-      toast.error("Failed to delete task");
+      toast.error("Failed to delete comment");
     },
   });
   return mutation;

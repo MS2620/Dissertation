@@ -9,14 +9,49 @@ import { Button } from "@/components/ui/button";
 import { useUpdateComment } from "../api/use-update-comment";
 import { useState } from "react";
 import { Textarea } from "@/components/ui/textarea";
+import { useDeleteComment } from "../api/use-delete-comment";
 
 interface CommentsOverviewProps {
   comments: CommentsResponse;
 }
 
+const CommentContent = ({ content }: { content: string }) => {
+  // Split content by code block markers
+  const parts = content.split("```");
+
+  return (
+    <>
+      {parts.map((part, index) => {
+        // Even indices are regular text, odd indices are code blocks
+        if (index % 2 === 0) {
+          return (
+            <p
+              key={index}
+              className="whitespace-pre-wrap text-muted-foreground dark:text-white"
+            >
+              {part}
+            </p>
+          );
+        } else {
+          return (
+            <pre
+              key={index}
+              className="my-2 p-4 rounded bg-neutral-800 dark:bg-neutral-900 font-mono text-sm overflow-x-auto"
+            >
+              <code className="text-white">{part}</code>
+            </pre>
+          );
+        }
+      })}
+    </>
+  );
+};
+
 const CommentsOverview = ({ comments }: CommentsOverviewProps) => {
   const [editingCommentId, setEditingCommentId] = useState<string | null>(null);
   const [value, setValue] = useState<string>("");
+  const { mutate: deleteComment, isPending: isPendingCommentDelete } =
+    useDeleteComment();
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { mutate, isPending } = useUpdateComment();
 
@@ -26,7 +61,13 @@ const CommentsOverview = ({ comments }: CommentsOverviewProps) => {
   };
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const handleSave = (commentId: string) => {};
+  const handleSave = (commentId: string) => {
+    // Implementation of save functionality
+  };
+
+  const handleDelete = (commentId: string) => {
+    deleteComment({ param: { commentId } });
+  };
 
   return (
     <div className="space-y-2">
@@ -59,14 +100,10 @@ const CommentsOverview = ({ comments }: CommentsOverviewProps) => {
                   </span>
                   <span className="text-neutral-400 text-xs mr-4">
                     <Button
-                      onClick={() =>
-                        editingCommentId === document.$id
-                          ? setEditingCommentId(null)
-                          : handleEdit(document.$id, document.comment)
-                      }
+                      onClick={() => handleDelete(document.$id)}
                       size="sm"
                       variant="destructive"
-                      disabled
+                      disabled={isPendingCommentDelete}
                     >
                       <TrashIcon className="size-4" />
                       Delete
@@ -90,7 +127,7 @@ const CommentsOverview = ({ comments }: CommentsOverviewProps) => {
                     rows={4}
                     onChange={(e) => setValue(e.target.value)}
                     disabled={isPending}
-                    className="dark:bg-neutral-700 dark:text-white"
+                    className="dark:bg-neutral-700 dark:text-white font-mono"
                   />
                   <Button
                     size="sm"
@@ -109,11 +146,9 @@ const CommentsOverview = ({ comments }: CommentsOverviewProps) => {
                   </Button>
                 </div>
               ) : (
-                <div>
+                <div className="break-words">
                   {document.comment && (
-                    <p className="w-[95%] mx-auto text-muted-foreground dark:text-white border-none break-all">
-                      {document.comment}
-                    </p>
+                    <CommentContent content={document.comment} />
                   )}
                 </div>
               )}
