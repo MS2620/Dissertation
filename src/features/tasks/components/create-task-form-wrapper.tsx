@@ -25,8 +25,6 @@ export const CreateTaskFormWrapper = ({
     projectId,
   });
 
-  console.log("members", members);
-
   const projectOptions = projects?.documents.map((project) => ({
     value: project.$id,
     label: project.name,

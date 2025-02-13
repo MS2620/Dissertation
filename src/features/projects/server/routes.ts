@@ -151,7 +151,7 @@ const app = new Hono()
     // Check if member is in project's assigneeId array or is an admin
     if (
       member.role !== MemberRole.ADMIN &&
-      !project.assigneeId.includes(member.$id)
+      !project.assigneeId.contains(member.$id)
     ) {
       return c.json({ error: "You don't have access to this project" }, 401);
     }
@@ -184,7 +184,7 @@ const app = new Hono()
     // Check if member is in project's assigneeId array or is an admin
     if (
       member.role !== MemberRole.ADMIN &&
-      !project.assigneeId.includes(member.$id)
+      !project.assigneeId.contains(member.$id)
     ) {
       return c.json({ error: "You don't have access to this project" }, 401);
     }
@@ -192,7 +192,7 @@ const app = new Hono()
     const members = await databases.listDocuments(
       DATABASE_ID,
       MEMBERS_ID, // Assuming this is your members collection ID
-      [Query.equal("$id", project.assigneeId)]
+      [Query.contains("$id", project.assigneeId)]
     );
 
     const populatedMembers = await Promise.all(
@@ -402,7 +402,7 @@ const app = new Hono()
     // Check if member is in project's assigneeId array or is an admin
     if (
       member.role !== MemberRole.ADMIN &&
-      !project.assigneeId.includes(member.$id)
+      !project.assigneeId.contains(member.$id)
     ) {
       return c.json({ error: "You don't have access to this project" }, 403);
     }
@@ -441,7 +441,7 @@ const app = new Hono()
       TASKS_ID,
       [
         Query.equal("projectId", projectId),
-        Query.equal("assigneeId", member.$id),
+        Query.contains("assigneeId", member.$id),
         Query.greaterThanEqual("$createdAt", thisMonthStart.toISOString()),
         Query.lessThanEqual("$createdAt", thisMonthEnd.toISOString()),
       ]
@@ -452,7 +452,7 @@ const app = new Hono()
       TASKS_ID,
       [
         Query.equal("projectId", projectId),
-        Query.equal("assigneeId", member.$id),
+        Query.contains("assigneeId", member.$id),
         Query.greaterThanEqual("$createdAt", lastMonthStart.toISOString()),
         Query.lessThanEqual("$createdAt", lastMonthEnd.toISOString()),
       ]

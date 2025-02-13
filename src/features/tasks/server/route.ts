@@ -78,10 +78,6 @@ const app = new Hono()
         Query.orderDesc("$createdAt"),
       ];
 
-      if (member.role !== MemberRole.ADMIN && !projectId) {
-        query.push(Query.equal("assigneeId", member.$id));
-      }
-
       if (projectId) {
         query.push(Query.equal("projectId", projectId));
       }
@@ -108,7 +104,7 @@ const app = new Hono()
       );
 
       const projectIds = tasks.documents.map((task) => task.projectId);
-      const assigneeIds = tasks.documents.map((task) => task.assigneeId);
+      const assigneeIds = tasks.documents.map((task) => task.assigneeId).flat();
 
       const projects = await databases.listDocuments<Project>(
         DATABASE_ID,
@@ -128,12 +124,13 @@ const app = new Hono()
           return { ...member, name: user.name, email: user.email };
         })
       );
+
       const populatedTasks = tasks.documents.map((task) => {
         const project = projects.documents.find(
           (project) => project.$id === task.projectId
         );
-        const assignee = assignees.find(
-          (assignee) => assignee.$id === task.assigneeId
+        const assignee = assignees.find((assignee) =>
+          assignee.$id.includes(task.assigneeId)
         );
         return {
           ...task,
@@ -145,119 +142,6 @@ const app = new Hono()
       return c.json({ data: { ...tasks, documents: populatedTasks } });
     }
   )
-
-  // .get(
-  //   "/all-tasks",
-  //   sessionMiddleware,
-  //   zValidator(
-  //     "query",
-  //     z.object({
-  //       workspaceId: z.string(),
-  //       projectId: z.string().nullish(),
-  //       assigneeId: z.string().nullish(),
-  //       status: z.nativeEnum(TaskStatus).nullish(),
-  //       search: z.string().nullish(),
-  //       dueDate: z.string().nullish(),
-  //     })
-  //   ),
-  //   async (c) => {
-  //     const { users } = await createAdminClient();
-  //     const databases = c.get("databases");
-  //     const user = c.get("user");
-
-  //     const { workspaceId, projectId, assigneeId, status, search, dueDate } =
-  //       c.req.valid("query");
-
-  //     const member = await getMember({
-  //       databases,
-  //       workspaceId,
-  //       userId: user.$id,
-  //     });
-
-  //     if (!member) {
-  //       return c.json({ error: "Unauthorized" }, 401);
-  //     }
-
-  //     const query = [
-  //       Query.equal("workspaceId", workspaceId),
-  //       Query.equal("assigneeId", member.$id),
-  //       Query.orderDesc("$createdAt"),
-  //     ];
-
-  //     if (projectId) {
-  //       console.log("projectId", projectId);
-  //       query.push(Query.equal("projectId", projectId));
-  //     }
-
-  //     if (status) {
-  //       console.log("status", status);
-  //       query.push(Query.equal("status", status));
-  //     }
-
-  //     // if (assigneeId) {
-  //     //   console.log("assigneeId", assigneeId);
-  //     //   query.push(Query.equal("assigneeId", assigneeId));
-  //     // }
-
-  //     if (dueDate) {
-  //       console.log("dueDate", dueDate);
-  //       query.push(Query.equal("dueDate", dueDate));
-  //     }
-
-  //     if (search) {
-  //       console.log("search", search);
-  //       query.push(Query.search("name", search));
-  //     }
-
-  //     const tasks = await databases.listDocuments<Task>(
-  //       DATABASE_ID,
-  //       TASKS_ID,
-  //       query
-  //     );
-
-  //     const projectIds = tasks.documents.map((task) => task.projectId);
-
-  //     const assigneeIds = tasks.documents.map((task) => task.assigneeId);
-
-  //     console.log(assigneeIds);
-
-  //     const projects = await databases.listDocuments<Project>(
-  //       DATABASE_ID,
-  //       PROJECTS_ID,
-  //       projectIds.length > 0 ? [Query.equal("$id", projectIds)] : []
-  //     );
-
-  //     const members = await databases.listDocuments(
-  //       DATABASE_ID,
-  //       MEMBERS_ID,
-  //       assigneeIds.length > 0 ? [Query.contains("$id", assigneeIds)] : []
-  //     );
-
-  //     const assignees = await Promise.all(
-  //       members.documents.map(async (member) => {
-  //         const user = await users.get(member.userId);
-  //         return { ...member, name: user.name, email: user.email };
-  //       })
-  //     );
-
-  //     const populatedTasks = tasks.documents.map((task) => {
-  //       const project = projects.documents.find(
-  //         (project) => project.$id === task.projectId
-  //       );
-  //       const assignee = assignees.find(
-  //         (assignee) => assignee.$id === task.assigneeId
-  //       );
-
-  //       return {
-  //         ...task,
-  //         project,
-  //         assignee,
-  //       };
-  //     });
-
-  //     return c.json({ data: { ...tasks, documents: populatedTasks } });
-  //   }
-  // )
 
   .post(
     "/",
@@ -344,7 +228,7 @@ const app = new Hono()
       // Allow if user is admin OR if they're assigned to the task
       if (
         member.role !== MemberRole.ADMIN &&
-        existingTask.assigneeId !== member.$id
+        !existingTask.assigneeId.includes(member.$id)
       ) {
         return c.json(
           { error: "You don't have access to modify this task" },
@@ -393,7 +277,7 @@ const app = new Hono()
 
     if (
       currentMember.role !== MemberRole.ADMIN &&
-      task.assigneeId !== currentMember.$id
+      !task.assigneeId.includes(currentMember.$id)
     ) {
       return c.json({ error: "You don't have access to this task" }, 403);
     }

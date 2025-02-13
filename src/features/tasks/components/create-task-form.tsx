@@ -8,7 +8,6 @@ import { cn } from "@/lib/utils";
 import { useWorkspaceId } from "@/features/workspaces/hooks/use-workspace-id";
 import { createTaskSchema } from "../schemas";
 import { useCreateTask } from "../api/use-create-task";
-import { MemberAvatar } from "@/features/members/components/member-avatar";
 import { TaskStatus } from "../types";
 
 import { DatePicker } from "@/components/date-picker";
@@ -33,6 +32,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { ProjectAvatar } from "@/features/projects/components/project-avatar";
 import { useProjectId } from "../hooks/use-project-id";
+import { MultiSelect } from "@/components/multi-select";
 
 interface CreateTaskFormProps {
   onCancel?: () => void;
@@ -119,30 +119,12 @@ export const CreateTaskForm = ({
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Assignee</FormLabel>
-                    <Select
+                    <MultiSelect
                       defaultValue={field.value}
                       onValueChange={field.onChange}
-                    >
-                      <FormControl>
-                        <SelectTrigger className="dark:bg-neutral-700">
-                          <SelectValue placeholder="Select an assignee" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <FormMessage />
-                      <SelectContent className="dark:bg-neutral-700">
-                        {memberOptions.map((member) => (
-                          <SelectItem key={member.$id} value={member.$id}>
-                            <div className="flex items-center gap-x-2">
-                              <MemberAvatar
-                                className="size-6"
-                                name={member.name}
-                              />
-                              {member.name}
-                            </div>
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                      options={memberOptions}
+                      placeholder="Select an assignee"
+                    />
                   </FormItem>
                 )}
               />
