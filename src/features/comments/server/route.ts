@@ -126,6 +126,10 @@ const app = new Hono()
         query
       );
 
+      if (comment.total === 0) {
+        return c.json({ error: "No Comments found" }, 400);
+      }
+
       const creatorIds = comment.documents.map((c) => c.creator);
 
       const validCreatorIds = creatorIds.filter(
@@ -240,8 +244,7 @@ const app = new Hono()
     async (c) => {
       const user = c.get("user");
       const databases = c.get("databases");
-      const storage = c.get("storage");
-      const { comment, document } = c.req.valid("json");
+      const { comment } = c.req.valid("json");
       const { commentId } = c.req.param();
 
       const existingComment = await databases.getDocument<Comment>(
@@ -271,24 +274,12 @@ const app = new Hono()
         return c.json({ error: "Unauthorized" }, 401);
       }
 
-      let uploadedDocument = null;
-
-      if (document instanceof File) {
-        const uploadedFile = await storage.createFile(
-          DOCUMENTS_ID,
-          ID.unique(),
-          document
-        );
-        uploadedDocument = uploadedFile.$id;
-      }
-
       const updatedComment = await databases.updateDocument(
         DATABASE_ID,
         COMMENTS_ID,
         commentId,
         {
           comment,
-          document: document ? uploadedDocument : existingComment.document,
         }
       );
 

@@ -69,7 +69,16 @@ const CommentsOverview = ({ comments }: CommentsOverviewProps) => {
   };
 
   const handleDelete = (commentId: string) => {
-    deleteComment({ param: { commentId } });
+    deleteComment(
+      { param: { commentId } },
+      {
+        onSuccess: () => {
+          if (comments.documents.length === 1) {
+            window.location.reload();
+          }
+        },
+      }
+    );
   };
 
   return (
