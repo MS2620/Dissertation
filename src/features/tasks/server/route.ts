@@ -129,8 +129,8 @@ const app = new Hono()
         const project = projects.documents.find(
           (project) => project.$id === task.projectId
         );
-        const assignee = assignees.find((assignee) =>
-          assignee.$id.includes(task.assigneeId)
+        const assignee = assignees.filter((assignee) =>
+          task.assigneeId.includes(assignee.$id)
         );
         return {
           ...task,
@@ -265,6 +265,10 @@ const app = new Hono()
       taskId
     );
 
+    if (!task) {
+      return c.json({ error: "Task not found" }, 404);
+    }
+
     const currentMember = await getMember({
       databases,
       workspaceId: task.workspaceId,
@@ -277,7 +281,7 @@ const app = new Hono()
 
     if (
       currentMember.role !== MemberRole.ADMIN &&
-      !task.assigneeId.includes(currentMember.$id)
+      !task.assigneeId.includes(currentMember.$id) // Check multiple assignees
     ) {
       return c.json({ error: "You don't have access to this task" }, 403);
     }
@@ -288,21 +292,25 @@ const app = new Hono()
       task.projectId
     );
 
-    const member = await databases.getDocument(
+    // Fetch all assignees
+    const assigneeIds = Array.isArray(task.assigneeId)
+      ? task.assigneeId
+      : [task.assigneeId];
+
+    const members = await databases.listDocuments(
       DATABASE_ID,
       MEMBERS_ID,
-      task.assigneeId
+      assigneeIds.length > 0 ? [Query.contains("$id", assigneeIds)] : []
     );
 
-    const user = await users.get(member.userId);
+    const assignees = await Promise.all(
+      members.documents.map(async (member) => {
+        const user = await users.get(member.userId);
+        return { ...member, name: user.name, email: user.email };
+      })
+    );
 
-    const assignee = {
-      ...member,
-      name: user.name,
-      email: user.email,
-    };
-
-    return c.json({ data: { ...task, project, assignee } });
+    return c.json({ data: { ...task, project, assignees } });
   })
 
   .post(

@@ -96,7 +96,16 @@ interface TaskListProps {
 export const TaskList = ({ data, total }: TaskListProps) => {
   const workspaceId = useWorkspaceId();
 
+  const { data: member } = useGetMembers({
+    workspaceId,
+  });
+
   const { open: createTask } = useCreateTaskModal();
+
+  if (!member?.documents || member.documents.length < 1) {
+    return null;
+  }
+
   return (
     <div className="flex flex-col gap-y-4 col-span-1">
       <div className="bg-muted rounded-lg p-4">

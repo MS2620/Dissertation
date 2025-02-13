@@ -33,9 +33,18 @@ export const TaskOverview = ({ task }: TaskOverviewProps) => {
         <Separator className="my-4 dark:bg-neutral-700" />
         <div className="flex flex-col gap-y-4">
           <OverviewProperty label="Assignee">
-            <MemberAvatar name={task.assignee.name} className="size-6" />
-            <p className="text-sm font-medium">{task.assignee.name}</p>
+            <div className="flex flex-wrap items-center gap-2">
+              {task.assignees.map(
+                ({ $id, name }: { $id: string; name: string }) => (
+                  <div key={$id} className="flex items-center gap-2">
+                    <MemberAvatar name={name} className="size-6" />
+                    <p className="text-sm font-medium">{name}</p>
+                  </div>
+                )
+              )}
+            </div>
           </OverviewProperty>
+
           <OverviewProperty label="DueDate">
             <TaskDate value={task.dueDate} className="text-sm font-medium" />
           </OverviewProperty>

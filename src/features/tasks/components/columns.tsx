@@ -61,29 +61,37 @@ export const columns: ColumnDef<Task>[] = [
     },
   },
   {
-    accessorKey: "assignee",
+    accessorKey: "assignee", // Updated key
     header: ({ column }) => {
       return (
         <Button
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
-          Assignee
+          Assignees
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       );
     },
     cell: ({ row }) => {
-      const assignee = row.original.assignee;
+      const assignees = row.original.assignee || []; // Ensure it's an array
 
       return (
-        <div className="flex items-center gap-x-2 text-sm font-medium">
-          <MemberAvatar
-            className="size-6"
-            fallbackClassName="text-xs"
-            name={assignee.name}
-          />
-          <p className="line-clamp-1">{assignee.name}</p>
+        <div className="flex items-center gap-x-2 text-sm font-medium flex-wrap">
+          {assignees.length > 0 ? (
+            assignees.map(({ $id, name }: { $id: string; name: string }) => (
+              <div key={$id} className="flex items-center gap-x-1">
+                <MemberAvatar
+                  className="size-6"
+                  fallbackClassName="text-xs"
+                  name={name}
+                />
+                <p className="line-clamp-1">{name}</p>
+              </div>
+            ))
+          ) : (
+            <p className="text-muted-foreground">Unassigned</p>
+          )}
         </div>
       );
     },
