@@ -84,7 +84,7 @@ export const columns: ColumnDef<Task>[] = [
                 <MemberAvatar
                   className="size-6"
                   fallbackClassName="text-xs"
-                  name={name}
+                  names={name}
                 />
                 <p className="line-clamp-1">{name}</p>
               </div>

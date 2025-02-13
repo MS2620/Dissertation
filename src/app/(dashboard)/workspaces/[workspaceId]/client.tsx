@@ -134,15 +134,42 @@ export const TaskList = ({ data, total }: TaskListProps) => {
                     </div>
 
                     <div className="flex items-center gap-x-2">
-                      <p className="text-[14px]">
-                        Project: {task.project?.name}
+                      <p className="text-[14px] truncate">
+                        {task.project?.name}
                       </p>
                       <div className="size-1 rounded-full bg-neutral-300" />
-                      <p className="text-[12px] text-muted-foreground pt-[2px]">
-                        Assignee: {task.assignee.name}
-                      </p>
+                      <div className="text-[12px] text-muted-foreground pt-[2px]">
+                        <div className="flex items-center gap-x-1">
+                          <p className="hidden sm:flex">Assignee:</p>
+                          {Array.isArray(task.assignee) ? (
+                            task.assignee.map(
+                              ({
+                                $id,
+                                name,
+                              }: {
+                                $id: string;
+                                name: string;
+                              }) => (
+                                <div
+                                  key={$id}
+                                  className="flex flex-col md:flex-row items-center gap-x-1"
+                                >
+                                  <MemberAvatar
+                                    names={name}
+                                    className="size-5"
+                                    fallbackClassName="text-xs"
+                                  />
+                                  <p className="line-clamp-1">{name}</p>
+                                </div>
+                              )
+                            )
+                          ) : (
+                            <p>{task.assignee?.name || "Unassigned"}</p>
+                          )}
+                        </div>
+                      </div>
                       <div className="size-1 rounded-full bg-neutral-300" />
-                      <div className="text-sm text-muted-foreground flex items-center">
+                      <div className="truncate text-sm text-muted-foreground flex items-center">
                         <CalendarIcon className="size-3 mr-1" />
                         <span className="truncate text-[12px] text-muted-foreground pt-[2px]">
                           {new Date(task.dueDate) < new Date()
@@ -250,7 +277,7 @@ export const MembersList = ({ data, total, isAdmin }: MembersListProps) => {
             <li key={member.$id}>
               <Card className="shadow-none rounded-lg overflow-hidden dark:bg-neutral-700">
                 <CardContent className="p-3 flex flex-col items-center gap-x-2">
-                  <MemberAvatar name={member.name} className="size-12" />
+                  <MemberAvatar names={member.name} className="size-12" />
                   <div className="flex flex-col items-center overflow-hidden">
                     <p className="text-lg font-medium line-clamp-1">
                       {member.name}

@@ -8,7 +8,7 @@ import { Member } from "@/features/members/types";
 
 interface EventCardProps {
   title: string;
-  assignee: Member;
+  assignee: Member[];
   status: TaskStatus;
   $id: string;
 }
@@ -30,6 +30,11 @@ export const EventCard = ({ title, assignee, status, $id }: EventCardProps) => {
     router.push(`/workspaces/${workspaceId}/tasks/${$id}`);
   };
 
+  console.log("EventCard", title, assignee, status, $id);
+
+  // Extract assignee names to pass as a string array
+  const assigneeNames = assignee.map((a) => a.name);
+
   return (
     <div className="px-2">
       <div
@@ -41,9 +46,11 @@ export const EventCard = ({ title, assignee, status, $id }: EventCardProps) => {
       >
         <p>{title}</p>
         <div className="flex items-center gap-x-1">
-          <MemberAvatar name={assignee?.name} />
+          {/* Pass assignee names as an array of strings */}
+          <MemberAvatar names={assigneeNames} />
           <div className="size-1 rounded-full bg-neutral-300" />
-          <p>{assignee?.name}</p>
+          {/* Display the list of assignee names */}
+          <p>{assigneeNames.join(", ")}</p>
         </div>
       </div>
     </div>

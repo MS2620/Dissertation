@@ -9,7 +9,23 @@ interface KanbanCardProps {
   task: Task;
 }
 
+interface Assignee {
+  $collectionId: string;
+  $createdAt: string;
+  $databaseId: string;
+  $id: string;
+  $permissions: string[];
+  $updatedAt: string;
+  email: string;
+  name: string;
+  role: string;
+  userId: string;
+  workspaceId: string;
+}
+
 export const KanbanCard = ({ task }: KanbanCardProps) => {
+  const assignees: Assignee[] = task.assignee || [];
+
   return (
     <div className="p-2.5 mb-1.5 bg-white rounded shadow-sm space-y-3 dark:bg-neutral-600">
       <div className="flex items-start justify-between gap-x-2">
@@ -21,7 +37,7 @@ export const KanbanCard = ({ task }: KanbanCardProps) => {
       <Separator className="dark:bg-neutral-700" />
       <div className="flex items-center">
         <MemberAvatar
-          name={task.assignee.name}
+          names={assignees.map((assignee) => assignee.name)} // Passing an array of names
           fallbackClassName="text-[10px]"
         />
         <div className="size-1 rounded-full bg-neutral-300 ml-2" />

@@ -151,7 +151,7 @@ const app = new Hono()
     // Check if member is in project's assigneeId array or is an admin
     if (
       member.role !== MemberRole.ADMIN &&
-      !project.assigneeId.contains(member.$id)
+      !project.assigneeId.includes(member.$id)
     ) {
       return c.json({ error: "You don't have access to this project" }, 401);
     }
@@ -402,7 +402,7 @@ const app = new Hono()
     // Check if member is in project's assigneeId array or is an admin
     if (
       member.role !== MemberRole.ADMIN &&
-      !project.assigneeId.contains(member.$id)
+      !project.assigneeId.includes(member.$id)
     ) {
       return c.json({ error: "You don't have access to this project" }, 403);
     }

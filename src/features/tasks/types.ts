@@ -8,11 +8,25 @@ export enum TaskStatus {
   DONE = "DONE",
 }
 
+interface Assignee {
+  $id: string;
+  $collectionId: string;
+  $createdAt: string;
+  $databaseId: string;
+  $permissions: string[];
+  $updatedAt: string;
+  email: string;
+  name: string;
+  role: string;
+  userId: string;
+  workspaceId: string;
+}
+
 export type Task = Models.Document & {
   name: string;
   status: TaskStatus;
   workspaceId: string;
-  assigneeId: string;
+  assignees: Assignee[];
   projectId: string;
   position: number;
   dueDate: string;

@@ -88,7 +88,7 @@ const CommentsOverview = ({ comments }: CommentsOverviewProps) => {
           <CardTitle>
             <div className="flex flex-col w-full p-2">
               <div className="flex flex-row">
-                <MemberAvatar className="size-8 mr-2" name={document.creator} />
+                <MemberAvatar className="size-8 mr-2" names={document.creator} />
                 <span>{document.creator}</span>
                 <div className="ml-auto">
                   <span className="text-neutral-400 text-xs mr-1">

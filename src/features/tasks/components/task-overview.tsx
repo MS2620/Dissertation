@@ -15,9 +15,18 @@ interface TaskOverviewProps {
 
 export const TaskOverview = ({ task }: TaskOverviewProps) => {
   const { open } = useEditTaskModal();
+
+  // Ensure all assignees are of type Assignee
+  const assigneesWithFullData = task.assignees.map((assignee) => ({
+    ...assignee,
+    role: assignee.role || "default_role", // Default value if missing
+    userId: assignee.userId || "", // Default value if missing
+    workspaceId: assignee.workspaceId || "", // Default value if missing
+  }));
+
   return (
     <div className="flex flex-col gap-y-4 col-span-1 dark:bg-neutral-800 rounded-lg">
-      <div className="bg-muted rounded-lg p-4 ">
+      <div className="bg-muted rounded-lg p-4">
         <div className="flex items-center justify-between">
           <p className="text-lg font-semibold">Overview</p>
           <Button
@@ -34,10 +43,10 @@ export const TaskOverview = ({ task }: TaskOverviewProps) => {
         <div className="flex flex-col gap-y-4">
           <OverviewProperty label="Assignee">
             <div className="flex flex-wrap items-center gap-2">
-              {task.assignees.map(
+              {assigneesWithFullData.map(
                 ({ $id, name }: { $id: string; name: string }) => (
                   <div key={$id} className="flex items-center gap-2">
-                    <MemberAvatar name={name} className="size-6" />
+                    <MemberAvatar names={name} className="size-6" />
                     <p className="text-sm font-medium">{name}</p>
                   </div>
                 )

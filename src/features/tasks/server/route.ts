@@ -78,6 +78,10 @@ const app = new Hono()
         Query.orderDesc("$createdAt"),
       ];
 
+      if (member.role !== MemberRole.ADMIN) {
+        query.push(Query.contains("assigneeId", member.$id));
+      }
+
       if (projectId) {
         query.push(Query.equal("projectId", projectId));
       }
@@ -121,7 +125,14 @@ const app = new Hono()
       const assignees = await Promise.all(
         members.documents.map(async (member) => {
           const user = await users.get(member.userId);
-          return { ...member, name: user.name, email: user.email };
+          return {
+            ...member,
+            name: user.name,
+            email: user.email,
+            role: member.role,
+            userId: member.userId,
+            workspaceId: member.workspaceId,
+          };
         })
       );
 
@@ -306,7 +317,14 @@ const app = new Hono()
     const assignees = await Promise.all(
       members.documents.map(async (member) => {
         const user = await users.get(member.userId);
-        return { ...member, name: user.name, email: user.email };
+        return {
+          ...member,
+          name: user.name,
+          email: user.email,
+          role: member.role,
+          userId: member.userId,
+          workspaceId: member.workspaceId,
+        };
       })
     );
 
