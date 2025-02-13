@@ -128,7 +128,6 @@ export const CreateCommentForm = ({ onCancel }: { onCancel?: () => void }) => {
   const handleDocumentChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
-      console.log("Selected file:", file.name, file.type, file.size);
       setSelectedFile(file);
       form.setValue("document", file);
     }

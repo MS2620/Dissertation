@@ -240,6 +240,7 @@ const app = new Hono()
     async (c) => {
       const user = c.get("user");
       const databases = c.get("databases");
+      const storage = c.get("storage");
       const { comment, document } = c.req.valid("json");
       const { commentId } = c.req.param();
 
@@ -249,8 +250,36 @@ const app = new Hono()
         commentId
       );
 
-      if (user.$id !== existingComment.creator) {
+      const taskComment = existingComment?.taskId;
+
+      const task = await databases.getDocument(
+        DATABASE_ID,
+        TASKS_ID,
+        taskComment
+      );
+
+      const member = await getMember({
+        databases,
+        workspaceId: task.workspaceId,
+        userId: user.$id,
+      });
+
+      if (
+        member.role !== MemberRole.ADMIN ||
+        member.$id !== existingComment.creator
+      ) {
         return c.json({ error: "Unauthorized" }, 401);
+      }
+
+      let uploadedDocument = null;
+
+      if (document instanceof File) {
+        const uploadedFile = await storage.createFile(
+          DOCUMENTS_ID,
+          ID.unique(),
+          document
+        );
+        uploadedDocument = uploadedFile.$id;
       }
 
       const updatedComment = await databases.updateDocument(
@@ -259,7 +288,7 @@ const app = new Hono()
         commentId,
         {
           comment,
-          document: document ? document : existingComment.document,
+          document: document ? uploadedDocument : existingComment.document,
         }
       );
 

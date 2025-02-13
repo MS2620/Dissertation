@@ -52,6 +52,8 @@ const CommentsOverview = ({ comments }: CommentsOverviewProps) => {
   const [value, setValue] = useState<string>("");
   const { mutate: deleteComment, isPending: isPendingCommentDelete } =
     useDeleteComment();
+  const { mutate: editComment, isPending: isPendingCommentUpdate } =
+    useUpdateComment();
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { mutate, isPending } = useUpdateComment();
 
@@ -62,7 +64,8 @@ const CommentsOverview = ({ comments }: CommentsOverviewProps) => {
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const handleSave = (commentId: string) => {
-    // Implementation of save functionality
+    editComment({ param: { commentId }, json: { comment: value } });
+    setEditingCommentId(null);
   };
 
   const handleDelete = (commentId: string) => {
@@ -88,7 +91,7 @@ const CommentsOverview = ({ comments }: CommentsOverviewProps) => {
                       }
                       size="sm"
                       variant="outline"
-                      disabled
+                      disabled={isPendingCommentUpdate}
                     >
                       {editingCommentId === document.$id ? (
                         <XIcon className="size-4" />
